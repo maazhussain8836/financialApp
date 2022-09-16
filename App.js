@@ -20,12 +20,8 @@ import DatePicker from './src/components/DatePicker'
 import AppContext from './src/components/AppContext'
 import LightBox from './src/components/LightBox'
 import CountryPicker from './src/components/CountryPicker'
-import RectangleScanner from './src/components/RectangleScanner'
-// import CamScan from './src/components/CamScan'
-// import PrespImg, { CropView } from './src/components/PrespImg'
-
-
-
+import ImgCropper from './src/components/ImgCropper'
+import Mask from './src/components/Mask'
 
 
 const App = () => {
@@ -41,7 +37,8 @@ const App = () => {
     <SafeAreaView style={{flex:1,backgroundColor:'#FFF'}}>
 
         <StackNavigation/>
-        {/* <RectangleScanner/> */}
+        {/* <ImgCropper/> */}
+        {/* <Mask/> */}
         {/* <CamScan/> */}
         {/* <CropView/> */}
         {/* <LightBox/> */}

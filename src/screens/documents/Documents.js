@@ -12,19 +12,20 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState, useContext, useEffect} from 'react';
-import {launchCamera} from 'react-native-image-picker';
+// import {launchCamera} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../../components/Button';
 import AppContext from '../../components/AppContext';
 import ImageView from 'react-native-image-viewing';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const Documents = ({navigation}) => {
-const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-const [visible, setIsVisible] = useState(false);
-const [cIndex, setCindex] = useState(0);
+  const [visible, setIsVisible] = useState(false);
+  const [cIndex, setCindex] = useState(0);
 
   const onPressNext = () => {
     navigation.navigate('Welcome');
@@ -36,46 +37,67 @@ const [cIndex, setCindex] = useState(0);
   }, []);
 
   const openCamer = () => {
-    launchCamera({
-      width: 300,
-      maxHeight:200,
-      maxWidth:100,
-      height: 400,
-      cropping: true,
-      freeStyleCropEnabled: true,
-      saveToPhotos: true,
-      mediaType: 'mixed',
-      includeBase64: true,
-    })
-      .then(image => {
-        console.log('Saving image');
-        // setPhotoURI(image.assets[0].uri);
-        console.log(image.assets[0].uri);
+    // launchCamera({
+    //   width: 300,
+    //   maxHeight:200,
+    //   maxWidth:100,
+    //   height: 400,
+    //   cropping: true,
+    //   freeStyleCropEnabled: true,
+    //   saveToPhotos: true,
+    //   mediaType: 'mixed',
+    //   includeBase64: true,
+    // })
+    //   .then(image => {
+    //     // setPhotoURI(image.assets[0].uri);
+    //     console.log(image.assets[0].uri);
+    //     console.log('Saving image');
+    //     context.images.push({
+    //       id: Math.floor(Math.random() * 100),
+    //       uri: image.assets[0].uri,
+    //     });
+    //     context.setImages([...context.images]);
+
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
+    
+      ImagePicker.openCamera({
+        width: 300,
+        height: 400,
+        cropping: true,
+        freeStyleCropEnabled: true,
+        cropperActiveWidgetColor:'#424242',
+        cropperStatusBarColor:'#424242',
+        cropperToolbarColor:'#424242'
+      }).then(image => {
         context.images.push({
           id: Math.floor(Math.random() * 100),
-          uri: image.assets[0].uri,
+          uri: image.path,
         });
         context.setImages([...context.images]);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      })    
+        .catch(error => {
+            console.log(error);
+          });
+    
   };
 
-  const oipenBox = (i) => {
-    setCindex(i)
-    setIsVisible(!visible)
-  }
-  const removeImg = (i) => {
-   context.images.splice(i, 1);
-   context.setImages([...context.images]);
-  }
+  const oipenBox = i => {
+    setCindex(i);
+    setIsVisible(!visible);
+  };
+  const removeImg = i => {
+    context.images.splice(i, 1);
+    context.setImages([...context.images]);
+  };
 
-  // const emptyArray = (i) => {
-  //   context.images.length(i==0);
-  //   context.setImages([...context.images]);
-  //  }
- 
+  const emptyArray = i => {
+    context.images.splice(i);
+    context.setImages([...context.images]);
+  };
+
   return (
     <ScrollView>
       <View
@@ -83,6 +105,7 @@ const [cIndex, setCindex] = useState(0);
           flex: 1,
           paddingHorizontal: '8%',
           paddingVertical: '10%',
+          paddingBottom: '100%',
           backgroundColor: '#FFF',
         }}>
         <Modal
@@ -167,7 +190,7 @@ const [cIndex, setCindex] = useState(0);
                     <Pressable
                       onPress={() => {
                         navigation.navigate('Welcome');
-                        
+                        emptyArray();
                       }}>
                       <Text style={styles.btntext}>Send</Text>
                     </Pressable>
@@ -196,8 +219,8 @@ const [cIndex, setCindex] = useState(0);
               <Text style={{color: '#0071BC', textDecorationLine: 'underline'}}>
                 Documents{i + 1}.jpg
               </Text>
-              <TouchableOpacity onPress={()=>removeImg()}>
-              <Text style={{color: '#ED1C24'}}>Remove</Text>
+              <TouchableOpacity onPress={() => removeImg()}>
+                <Text style={{color: '#ED1C24'}}>Remove</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           );

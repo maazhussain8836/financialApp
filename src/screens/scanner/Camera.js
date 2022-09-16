@@ -29,23 +29,36 @@ const Camera = () => {
 
     else if (c == 'c')
      {
-        launchCamera({
-          width: 300,
-          height: 400,
-          cropping: true,
-          freeStyleCropEnabled: true,
-          saveToPhotos: true
-        })
-          .then(image => {
+        // launchCamera({
+        //   width: 300,
+        //   height: 400,
+        //   cropping: true,
+        //   freeStyleCropEnabled: true,
+        //   saveToPhotos: true
+        // })
+        //   .then(image => {
   
-            setPhotoURI(image.assets[0].uri);
-            // imageUpload(image);
+        //     setPhotoURI(image.assets[0].uri);
+        //   })
+        //   .catch(error => {
+        //     console.log(error)
+        //   });
+        setTimeout(() => {
+          launchCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+            freeStyleCropEnabled: true,
           })
-          .catch(error => {
-            console.log(error)
-          });
+            .then(image => {
+              // setPhotoURI(image.assets[0].uri);
+              console.log(image);
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        }, 1000);
       }
-    // refRBSheet.current.close();
 };
 
 

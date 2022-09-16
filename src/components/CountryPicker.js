@@ -7,26 +7,37 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import PhoneInput from 'react-native-phone-number-input';
-import {isValidNumber} from 'react-native-phone-number-input';
-// import {Colors} from 'react-native/Libraries/NewAppScreen';
-
+// import PhoneInput from 'react-native-phone-number-input';
+import MaskInput, { Masks } from 'react-native-mask-input';
 const CountryPicker = () => {
-  const phoneInput = useRef(null);
+  // const phoneInput = useRef(null);
+  const [phone, setPhone] = useState('');
   return (
     <>
       <View style={styles.inpurText}>
-        <PhoneInput
+        {/* <PhoneInput
           ref={phoneInput}
-          defaultCode="PK"
+          // defaultCode="PK"
           textInputStyle={{Color: '#FFFFFF', padding: 2, marginVertical: '-5%'}}
           textContainerStyle={{backgroundColor: '#FFFFFF'}}
-          containerStyle={{backgroundColor: '#FFFFFF', width: '100%'}}
+          // containerStyle={{backgroundColor: '#FFFFFF', width: '100%'}}
           placeholder=" "
           withDarkTheme="true"
           withShadow="true"
           autoFocus={false}
-        />
+        /> */}
+      <MaskInput
+      value={phone}
+      
+      onChangeText={(masked, unmasked) => {
+        setPhone(masked); // you can use the unmasked value as well
+
+        // assuming you typed "9" all the way:
+        console.log(masked); // (99) 99999-9999
+        console.log(unmasked); // 99999999999
+      }}
+      mask={Masks.USA_PHONE}
+    />
       </View>
     </>
   );
