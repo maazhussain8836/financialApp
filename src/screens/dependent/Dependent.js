@@ -14,10 +14,26 @@ import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import CustomInputs from '../../components/CustomInputs';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
-import DatePicker from '../../components/DatePicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment'
 const Dependent = ({route, navigation}) => {
   const [Username, setUsername] = '';
   const [text, setText] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [dob, setDob] = useState('')
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    console.log(date)
+    setDob(moment(date).format('DD/MM/yy'))
+    hideDatePicker();
+  };
 
   const goNext = () => {
     navigation.navigate('BankInfo');
@@ -79,8 +95,38 @@ const Dependent = ({route, navigation}) => {
             <Text style={styles.formText}>Social Security #</Text>
           </View>
         </View>
-        <DatePicker text="Date Of Birth" width="100%" />
-        <DatePicker text="Month Lived with you during years" width="100%" />
+
+        <View style={{marginTop: '10%', width:'100%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Date Of Birth</Text>
+      </View>
+    </View>
+
+        <View style={{marginTop: '10%', width:'100%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Month Lived with you during years</Text>
+      </View>
+    </View>
 
         <View
           style={{

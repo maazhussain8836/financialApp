@@ -1,9 +1,11 @@
 import { View, Text } from 'react-native'
-import React, { useState } from 'react'
-import StackNavigation from './src/navigationContainer/StackNavigation'
+import React, { useState,useEffect } from 'react'
+import AppContext from './src/components/AppContext'
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+// import Screens
 import Taxpayer from './src/screens/taxpayerInfo/Taxpayer'
 import BankInfo from './src/screens/bankInfo/BankInfo'
-import Camera from './src/screens/scanner/Camera'
 import Documents from './src/screens/documents/Documents'
 import ModalComponent from './src/screens/modal/ModalComponent'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -16,48 +18,44 @@ import SignUp1 from './src/screens/signup/SignUp1'
 import Spouse from './src/screens/spouseInfo/Spouse'
 import Verification from './src/screens/verification/Verification'
 import Welcome from './src/screens/welcome/Welcome'
-import DatePicker from './src/components/DatePicker'
-import AppContext from './src/components/AppContext'
-import LightBox from './src/components/LightBox'
-import CountryPicker from './src/components/CountryPicker'
-import ImgCropper from './src/components/ImgCropper'
-import Mask from './src/components/Mask'
 
 
 const App = () => {
   const [images,setImages]=useState([]);
+  const [userToken, setuserToken] = useState(null);
 
   const value={
+    userToken: userToken,
     images:images,
-    setImages
+    setImages,
+    setuserToken
   }
 
   return (
     <AppContext.Provider value={value}>
     <SafeAreaView style={{flex:1,backgroundColor:'#FFF'}}>
 
-        <StackNavigation/>
-        {/* <ImgCropper/> */}
-        {/* <Mask/> */}
-        {/* <CamScan/> */}
-        {/* <CropView/> */}
-        {/* <LightBox/> */}
-        {/* <Intro1/> */}
-        {/* <Welcome/> */}
-        {/* <Spouse/> */}
-        {/* <Taxpayer/> */}
-        {/* <CountryPicker/> */}
-        {/* <DatePicker/> */}
-        {/* <Documents/> */}
-        {/* <SignIn/> */}
-        {/* <SignUp1/> */}
-        {/* <Dependent/> */}
-        {/* <BankInfo/> */}
-        {/* <Verification/> */}
+    <NavigationContainer >
+    <Stack.Navigator screenOptions={{headerShown:false}}>
+      <Stack.Screen name="Intro1" component={Intro1} />
+      <Stack.Screen name="ChangePass" component={ChangePass} />
+      <Stack.Screen name="Documents" component={Documents} />
+      <Stack.Screen name="ForgotPass" component={ForgotPass} />
+      <Stack.Screen name="Verification" component={Verification} />
+      <Stack.Screen name="BankInfo" component={BankInfo} />
+      <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen name="SignUp1" component={SignUp1} />
+      <Stack.Screen name="Taxpayer" component={Taxpayer} />
+      <Stack.Screen name="Spouse" component={Spouse} />
+      <Stack.Screen name="Dependent" component={Dependent} />
+      <Stack.Screen name="Welcome" component={Welcome} />
+      <Stack.Screen name="ModalComponent" component={ModalComponent} />
+    </Stack.Navigator>
+    </NavigationContainer>
 
     </SafeAreaView>
     </AppContext.Provider>
   )
 }
-
+const Stack = createNativeStackNavigator();
 export default App

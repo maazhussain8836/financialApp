@@ -14,15 +14,20 @@ import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import {RadioButton} from 'react-native-paper';
 import CustomInputs from '../../components/CustomInputs';
+
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import DatePicker from '../../components/DatePicker';
-import CountryPicker from '../../components/CountryPicker';
+
+import MaskInput, { Masks } from 'react-native-mask-input';
+
 const Taxpayer = ({navigation}) => {
   const [Username, setUsername] = '';
   const [text, setText] = useState('');
   const [spouseCheck, setspouseCheck] = useState(false);
   const [dependantCheck, setdependantCheck] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [dob, setDob] = useState('')
 
   const spouse = () => {
     setspouseCheck(!spouseCheck);
@@ -46,9 +51,6 @@ const Taxpayer = ({navigation}) => {
       navigation.navigate('BankInfo');
     }
   };
-
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -57,14 +59,12 @@ const Taxpayer = ({navigation}) => {
     setDatePickerVisibility(false);
   };
 
-  const [dob, setDob] = useState('08/09/22');
-
   const handleConfirm = date => {
-    console.log(date);
-    setDob(moment(date).format('DD/MM/yy'));
-
+    console.log(date)
+    setDob(moment(date).format('DD/MM/yy'))
     hideDatePicker();
   };
+ 
   return (
     <ScrollView>
       <View
@@ -121,7 +121,22 @@ const Taxpayer = ({navigation}) => {
             <Text style={styles.formText}>Social Security #</Text>
           </View>
         </View>
-            <DatePicker text='Date Of Birth' width='100%'/>
+
+        <View style={{marginTop: '10%', width:'100%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Date Picker</Text>
+      </View>
+    </View>
 
         <View
           style={{
@@ -164,9 +179,40 @@ const Taxpayer = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-          <DatePicker text="Issue Date" width='49%' />
-          <DatePicker text="Exp Date"  width='49%'/>
+               <View style={{marginTop: '10%', width:'49%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Issue Date</Text>
+      </View>
+    </View>
+
+    <View style={{marginTop: '10%', width:'49%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Exp Date</Text>
+      </View>
+    </View>
         </View>
+
+     
 
         <View
           style={{
@@ -251,13 +297,22 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-      
         <View style={{marginTop: '10%'}}>
-      <CountryPicker/>
-      <View style={styles.placeholderTxt}>
-          <Text style={styles.formText}>Phone Number</Text>
-        </View>
+        <View style={styles.inpurText}>
+      <MaskInput
+      value={phone}
+      onChangeText={(masked) => {
+        setPhone(masked); 
+        console.log(phone)
+      }}
+      mask={Masks.USA_PHONE}
+    />
       </View>
+
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Phone Number</Text>
+          </View>
+        </View>
 
         <View style={{marginTop: '10%'}}>
           <CustomInputs
@@ -410,6 +465,47 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     fontSize: 17,
+  },
+  inpurText: {
+    borderWidth: 1,
+    padding: 2,
+    borderColor: '#808080',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '100%',
+  },
+
+  message: {
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 20,
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  formText: {
+    fontSize: 16,
+    color: '#4D4D4D',
+  },
+  formText: {
+    fontSize: 16,
+    color: '#4D4D4D',
+  },
+  placeholderTxt: {
+    padding: 3,
+    position: 'absolute',
+    left: 10,
+    top: -16,
+    backgroundColor: '#FFF',
+  },
+
+  dateInput: {
+    borderWidth: 1,
+    fontSize: 17,
+    padding: 17,
+    color:'#000',
+    borderColor: '#808080',
+    width: '100%',
   },
 });
 export default Taxpayer;

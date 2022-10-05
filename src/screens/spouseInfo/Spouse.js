@@ -7,19 +7,23 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Pressable
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import CustomInputs from '../../components/CustomInputs';
-import DatePicker from '../../components/DatePicker';
-import CountryPicker from '../../components/CountryPicker';
+import MaskInput, { Masks } from 'react-native-mask-input';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment'
 
 const Spouse = ({route, navigation}) => {
   const [Username, setUsername] = '';
   const [text, setText] = useState('');
-
+  const [phone, setPhone] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [dob, setDob] = useState('')
   const {dependantCheck, spouseCheck} = route.params
 
   useEffect(() => {
@@ -33,6 +37,20 @@ const Spouse = ({route, navigation}) => {
       navigation.navigate('BankInfo');
     }
   }
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    console.log(date)
+    setDob(moment(date).format('DD/MM/yy'))
+    hideDatePicker();
+  };
+
 
   return (
     <ScrollView>
@@ -90,7 +108,21 @@ const Spouse = ({route, navigation}) => {
             <Text style={styles.formText}>Social Security #</Text>
           </View>
         </View>
-        <DatePicker text='Date Of Birth' width='100%'/>
+        <View style={{marginTop: '10%', width:'100%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Date Of Birth</Text>
+      </View>
+    </View>
 
         <View
           style={{
@@ -128,14 +160,43 @@ const Spouse = ({route, navigation}) => {
         </View>
 
       
-        <View
+      <View
           style={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-          <DatePicker text="Issue Date" width='49%' />
-          <DatePicker text="Exp Date"  width='49%'/>
+               <View style={{marginTop: '10%', width:'49%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Issue Date</Text>
+      </View>
+    </View>
+
+    <View style={{marginTop: '10%', width:'49%'}}>
+      <Pressable onPress={showDatePicker}>
+        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <View style={styles.placeholderTxt}>
+        <Text style={styles.formText}>Exp Date</Text>
+      </View>
+    </View>
         </View>
 
         <View style={{marginTop: '10%'}}>
@@ -151,11 +212,22 @@ const Spouse = ({route, navigation}) => {
         </View>
 
         <View style={{marginTop: '10%'}}>
-      <CountryPicker/>
-      <View style={styles.placeholderTxt}>
-          <Text style={styles.formText}>Phone Number</Text>
-        </View>
+        <View style={styles.inpurText}>
+      <MaskInput
+      value={phone}
+      onChangeText={(masked) => {
+        setPhone(masked); 
+        console.log(phone)
+      }}
+      mask={Masks.USA_PHONE}
+    />
       </View>
+
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Phone Number</Text>
+          </View>
+        </View>
+
 
 
         <View style={{marginTop: '10%'}}>
@@ -231,6 +303,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     fontSize: 17,
+  },
+  inpurText: {
+    borderWidth: 1,
+    padding: 2,
+    borderColor: '#808080',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '100%',
+  },
+
+  message: {
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 20,
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  formText: {
+    fontSize: 16,
+    color: '#4D4D4D',
   },
 });
 export default Spouse;

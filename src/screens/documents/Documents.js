@@ -20,21 +20,22 @@ import Button from '../../components/Button';
 import AppContext from '../../components/AppContext';
 import ImageView from 'react-native-image-viewing';
 import ImagePicker from 'react-native-image-crop-picker';
+import {PESDK} from 'react-native-photoeditorsdk';
 
 const Documents = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
-
   const [visible, setIsVisible] = useState(false);
   const [cIndex, setCindex] = useState(0);
-
+  // const [value, setValue] = useState('Documents');
+  // const [done, setDone] = useState('Done');
   const onPressNext = () => {
     navigation.navigate('Welcome');
   };
 
   const context = useContext(AppContext);
-  useEffect(() => {
-    console.log(context.images);
-  }, []);
+  // useEffect(() => {
+  //   console.log(context.images);
+  // }, []);
 
   const openCamer = () => {
     // launchCamera({
@@ -46,6 +47,7 @@ const Documents = ({navigation}) => {
     //   freeStyleCropEnabled: true,
     //   saveToPhotos: true,
     //   mediaType: 'mixed',
+    
     //   includeBase64: true,
     // })
     //   .then(image => {
@@ -62,26 +64,37 @@ const Documents = ({navigation}) => {
     //   .catch(error => {
     //     console.log(error);
     //   });
-    
-      ImagePicker.openCamera({
-        width: 300,
-        height: 400,
-        cropping: true,
-        freeStyleCropEnabled: true,
-        cropperActiveWidgetColor:'#424242',
-        cropperStatusBarColor:'#424242',
-        cropperToolbarColor:'#424242'
-      }).then(image => {
-        context.images.push({
-          id: Math.floor(Math.random() * 100),
-          uri: image.path,
-        });
-        context.setImages([...context.images]);
-      })    
-        .catch(error => {
-            console.log(error);
-          });
-    
+
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+      freeStyleCropEnabled: true,
+      cropperActiveWidgetColor: '#424242',
+      cropperStatusBarColor: '#424242',
+      cropperToolbarColor: '#424242',
+    })
+      .then(image => {
+        let imageAlpha = image.path;
+        PESDK.openEditor(imageAlpha).then(
+            (result) => {
+              console.log(result);
+              context.images.push({
+                id: Math.floor(Math.random() * 100),
+                uri: result.image,
+                name: 'Document '
+              });
+              context.setImages([...context.images]);
+            },
+            (error) => {
+              console.log(error);
+            },
+          );
+      
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   const oipenBox = i => {
@@ -94,9 +107,16 @@ const Documents = ({navigation}) => {
   };
 
   const emptyArray = i => {
+    // console.log(value)
+    console.log([...context.images]);
     context.images.splice(i);
     context.setImages([...context.images]);
   };
+
+  const changetxt = (t,i) =>{
+    context.images[i].name = t;
+    context.setImages([...context.images])
+  }
 
   return (
     <ScrollView>
@@ -216,9 +236,11 @@ const Documents = ({navigation}) => {
         {context?.images?.map((v, i) => {
           return (
             <TouchableOpacity style={styles.docV} onPress={() => oipenBox(i)}>
-              <Text style={{color: '#0071BC', textDecorationLine: 'underline'}}>
-                Documents{i + 1}.jpg
-              </Text>
+              <TextInput
+                value={v.name}
+                onChangeText={(text) => changetxt(text,i)}
+                style={{color: '#0071BC', textDecorationLine: 'underline'}}>
+              </TextInput>
               <TouchableOpacity onPress={() => removeImg()}>
                 <Text style={{color: '#ED1C24'}}>Remove</Text>
               </TouchableOpacity>
@@ -269,7 +291,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // borderWidth: 1,
     marginTop: '8%',
-    padding: '5%',
+    padding: '2%',
     backgroundColor: '#F2F2F2',
   },
   img: {
