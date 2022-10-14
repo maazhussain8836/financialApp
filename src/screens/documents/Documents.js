@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState, useContext, useEffect} from 'react';
-// import {launchCamera} from 'react-native-image-picker';
+
 import LinearGradient from 'react-native-linear-gradient';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,7 +20,9 @@ import Button from '../../components/Button';
 import AppContext from '../../components/AppContext';
 import ImageView from 'react-native-image-viewing';
 import ImagePicker from 'react-native-image-crop-picker';
+import { launchCamera } from 'react-native-image-picker';
 import {PESDK} from 'react-native-photoeditorsdk';
+
 
 const Documents = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -36,66 +38,46 @@ const Documents = ({navigation}) => {
   // useEffect(() => {
   //   console.log(context.images);
   // }, []);
-
-  const openCamer = () => {
-    // launchCamera({
-    //   width: 300,
-    //   maxHeight:200,
-    //   maxWidth:100,
-    //   height: 400,
-    //   cropping: true,
-    //   freeStyleCropEnabled: true,
-    //   saveToPhotos: true,
-    //   mediaType: 'mixed',
+const openCamer=()=>{
+  launchCamera({
+    width: 300,
+    height: 400,
+    includeBase64:true
+    // cropping: true,
+    // freeStyleCropEnabled: true,
+    // cropperActiveWidgetColor: '#424242',
+    // cropperStatusBarColor: '#424242',
+    // cropperToolbarColor: '#424242',
+  })
+    .then(image => {
+      let imageAlpha = image.assets[0].uri;
+      console.log(imageAlpha)
+      PESDK.openEditor(imageAlpha).then(
+          (result) => {
+            console.log(result,'PESDK');
+            context.images.push({
+              id: Math.floor(Math.random() * 100),
+              uri: result.image,
+              name: 'Document '
+            });
+            context.setImages([...context.images]);
+          },
+          (error) => {
+            console.log(error);
+          },
+        );
     
-    //   includeBase64: true,
-    // })
-    //   .then(image => {
-    //     // setPhotoURI(image.assets[0].uri);
-    //     console.log(image.assets[0].uri);
-    //     console.log('Saving image');
-    //     context.images.push({
-    //       id: Math.floor(Math.random() * 100),
-    //       uri: image.assets[0].uri,
-    //     });
-    //     context.setImages([...context.images]);
-
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-
-    ImagePicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
-      freeStyleCropEnabled: true,
-      cropperActiveWidgetColor: '#424242',
-      cropperStatusBarColor: '#424242',
-      cropperToolbarColor: '#424242',
     })
-      .then(image => {
-        let imageAlpha = image.path;
-        PESDK.openEditor(imageAlpha).then(
-            (result) => {
-              console.log(result);
-              context.images.push({
-                id: Math.floor(Math.random() * 100),
-                uri: result.image,
-                name: 'Document '
-              });
-              context.setImages([...context.images]);
-            },
-            (error) => {
-              console.log(error);
-            },
-          );
-      
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+    .catch(error => {
+      console.log(error);
+    });
+};
+
+
+
+
+
+
 
   const oipenBox = i => {
     setCindex(i);
@@ -259,7 +241,7 @@ const Documents = ({navigation}) => {
             padding: '3%',
             position: 'relative',
           }}>
-          <TouchableOpacity onPress={openCamer}>
+          <TouchableOpacity onPress={()=>{openCamer()}}>
             <Text style={{color: '#0071BC', fontSize: 19}}>Scan Document</Text>
             <View style={{position: 'absolute', right: 195}}>
               <Icon name="line-scan" size={25} color="#0071BC" />

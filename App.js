@@ -3,6 +3,7 @@ import React, { useState,useEffect } from 'react'
 import AppContext from './src/components/AppContext'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import Screens
 import Taxpayer from './src/screens/taxpayerInfo/Taxpayer'
 import BankInfo from './src/screens/bankInfo/BankInfo'
@@ -23,32 +24,68 @@ import Welcome from './src/screens/welcome/Welcome'
 const App = () => {
   const [images,setImages]=useState([]);
   const [userToken, setuserToken] = useState(null);
+  const [imageName,setImageName]=useState('')
 
   const value={
     userToken: userToken,
     images:images,
+    imageName:imageName,
+    setImageName,
     setImages,
     setuserToken
   }
+  console.log(userToken,' before Sign in')
 
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@auth_token');
+      if (value !== null) {
+        setuserToken(value)
+        // console.log(userToken,'get Data')
+      }
+      else{
+        setuserToken(null)
+      // console.log(userToken,'get Data error')
+      }
+    }
+     catch (e) { }
+  }
+  useEffect(() => {
+    getData()
+  }, [])
+  
+  
   return (
     <AppContext.Provider value={value}>
     <SafeAreaView style={{flex:1,backgroundColor:'#FFF'}}>
-
+    
     <NavigationContainer >
     <Stack.Navigator screenOptions={{headerShown:false}}>
-      <Stack.Screen name="Intro1" component={Intro1} />
+      {
+      userToken==null ?(
+        <>
+        <Stack.Screen name="Intro1" component={Intro1} />
+        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="Verification" component={Verification} />
+        <Stack.Screen name="SignUp1" component={SignUp1} />
+</>
+      ):(
+        <>
+        <Stack.Screen name="Intro1" component={Intro1} />
+        <Stack.Screen name="Welcome" component={Welcome} />
+
+        </>
+      )}
+      
       <Stack.Screen name="ChangePass" component={ChangePass} />
+      {/* <Stack.Screen name="Welcome" component={Welcome} /> */}
       <Stack.Screen name="Documents" component={Documents} />
       <Stack.Screen name="ForgotPass" component={ForgotPass} />
-      <Stack.Screen name="Verification" component={Verification} />
       <Stack.Screen name="BankInfo" component={BankInfo} />
-      <Stack.Screen name="SignIn" component={SignIn} />
-      <Stack.Screen name="SignUp1" component={SignUp1} />
       <Stack.Screen name="Taxpayer" component={Taxpayer} />
       <Stack.Screen name="Spouse" component={Spouse} />
       <Stack.Screen name="Dependent" component={Dependent} />
-      <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="ModalComponent" component={ModalComponent} />
     </Stack.Navigator>
     </NavigationContainer>

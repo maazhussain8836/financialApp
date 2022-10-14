@@ -9,12 +9,21 @@ import {
   Animated,
 } from 'react-native';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect,useContext} from 'react';
 import * as Animatable from 'react-native-animatable';
-
+import AppContext from '../../components/AppContext';
 const Intro1 = ({navigation}) => {
+
+  const context=useContext(AppContext)
+
   const onPressGo = () => {
-    navigation.navigate('SignIn');
+    if(context.userToken==null){
+      (navigation.navigate('SignIn'))
+    }
+    else{
+      (navigation.navigate('Welcome'))
+    }
+
   };
 
   // React native animation.......

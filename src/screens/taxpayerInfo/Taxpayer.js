@@ -8,35 +8,163 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import {RadioButton} from 'react-native-paper';
 import CustomInputs from '../../components/CustomInputs';
-
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-
-import MaskInput, { Masks } from 'react-native-mask-input';
+import MaskInput, {Masks} from 'react-native-mask-input';
+import axiosconfig from '../../provider/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../../components/Loader';
+import AppContext from '../../components/AppContext';
 
 const Taxpayer = ({navigation}) => {
-  const [Username, setUsername] = '';
-  const [text, setText] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [socialSecurity, setSocialSecurity] = useState('');
+  const [DL, setDl] = useState('');
+  const [Address, setAddress] = useState('');
+  const [City, setCity] = useState('');
+  const [State, setState] = useState('');
+  const [ZipCode, setZipCode] = useState('');
+  const [County, setCounty] = useState('');
+  const [Occupation, setOccupation] = useState('');
+  const [email, setEmail] = useState('');
   const [spouseCheck, setspouseCheck] = useState(false);
   const [dependantCheck, setdependantCheck] = useState(false);
   const [phone, setPhone] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [dob, setDob] = useState('')
+  const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
+  const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
+  const [DLState, setDLState] = useState('');
+  const [dob, setDob] = useState('');
+  const [IssueDate, setIssueDate] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [isloading, setIsLoading] = useState(false);
+
+  // const [taxPayerData,setTaxPayerData]=useState('')
+  const context = useContext(AppContext);
+
+
+  
+  const getApi= async()=>{
+    const value = await AsyncStorage.getItem('@auth_token');
+    // setIsLoading(true)
+  axiosconfig
+  .get('user_view', {
+    headers: {
+      Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+    },
+  })
+  .then(res => {
+    console.log(res.data[0]?.taxpayer_info, 'get Api response');
+    const dataTaxPayer=res.data[0]?.taxpayer_info
+    
+              setFirstName(dataTaxPayer.first_name)
+              setLastName(dataTaxPayer.last_name)
+              setSocialSecurity(dataTaxPayer.social_security)
+              setDl(dataTaxPayer.driving_license_dl)
+              setAddress(dataTaxPayer.address)
+              setCity(dataTaxPayer.city)
+              setState(dataTaxPayer.state)
+              setZipCode(dataTaxPayer.zipcode)
+              setCounty(dataTaxPayer.county)
+              setOccupation(dataTaxPayer.occuption)
+              setEmail(dataTaxPayer.email)
+              setspouseCheck(dataTaxPayer.have_spouse == '0'?  false : true) 
+              setdependantCheck(dataTaxPayer.have_dependant == '0'?  false : true)
+              setPhone(dataTaxPayer.cellphone)
+              setDLState(dataTaxPayer.driving_license_state)
+              setDob(dataTaxPayer.date_of_birth)
+              setIssueDate(dataTaxPayer.driving_license_issue_date)
+              setExpDate(dataTaxPayer.driving_license_exp_date)
+  
+   
+    // setIsLoading(false)
+  })
+  .catch(err => {
+    console.log(err, 'get Api response error');
+  });
+  
+  }
+  
+  useEffect(() => {
+ 
+    getApi()
+    
+  }, [])
+  
 
   const spouse = () => {
     setspouseCheck(!spouseCheck);
   };
+
+  // console.log(spouseCheck)
   const dependant = () => {
     setdependantCheck(!dependantCheck);
   };
 
-  const onPressNext = () => {
+
+  var data = {
+    first_name: firstName,
+    last_name: lastName,
+    social_security: socialSecurity,
+    date_of_birth: dob,
+    driving_license_state: DLState,
+    driving_license_dl: DL,
+    driving_license_issue_date: IssueDate,
+    driving_license_exp_date: expDate,
+    address: Address,
+    city: City,
+    state: State,
+    zipcode: ZipCode,
+    county: County,
+    occuption: Occupation,
+    cellphone: phone,
+    email: email,
+    have_spouse: spouseCheck ? '1' : '0',
+    have_dependant: dependantCheck ? '1' : '0',
+  };
+  
+  const onPressNext = async() => {
+    
+    const value = await AsyncStorage.getItem('@auth_token');
+
+    // create taxPayer data
+    axiosconfig
+    .post('create', data, {
+      headers: {
+        Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+      },
+    })
+    .then(res => {
+      console.log(res);
+      alert(res.data.messsage);
+    })
+    .catch(res => {
+      console.log(res);
+    });
+
+    // update taxPayer data
+    // axiosconfig
+    // .post('tax_update', data, {
+    //   headers: {
+    //     Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+    //   },
+    // })
+    // .then(res => {
+    //   console.log(res);
+    //   alert(res.data.messsage);
+    // })
+    // .catch(res => {
+    //   console.log(res);
+    // });
+    
+ 
     if (spouseCheck) {
       navigation.navigate('Spouse', {
         dependantCheck: dependantCheck,
@@ -51,20 +179,40 @@ const Taxpayer = ({navigation}) => {
       navigation.navigate('BankInfo');
     }
   };
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
+  const showDatePicker1 = () => {
+    setDatePickerVisibility1(true);
+  };
+  const showDatePicker2 = () => {
+    setDatePickerVisibility2(true);
+  };
 
   const hideDatePicker = () => {
-    setDatePickerVisibility(false);
+    setDatePickerVisibility2(false);
   };
 
-  const handleConfirm = date => {
-    console.log(date)
-    setDob(moment(date).format('DD/MM/yy'))
+  const handleConfirmDob = date => {
+    console.log(date);
+    // setDob(null)
+    setDob(moment(date).format('DD/MM/yy'));
     hideDatePicker();
   };
- 
+  const handleConfirmIssueDate = date => {
+    console.log(date);
+    // setIssueDate(null)
+    setIssueDate(moment(date).format('DD/MM/yy'));
+    hideDatePicker();
+  };
+  const handleConfirmExpDate = date => {
+    console.log(date);
+    // setExpDate(null)
+    setExpDate(moment(date).format('DD/MM/yy'));
+    hideDatePicker();
+  };
+
   return (
     <ScrollView>
       <View
@@ -74,6 +222,8 @@ const Taxpayer = ({navigation}) => {
           paddingVertical: '10%',
           backgroundColor: '#FFF',
         }}>
+        {isloading ? <Loader /> : null}
+        {/* <Loader/> */}
         <View style={{position: 'absolute'}}>
           <Image
             source={require('../../assets/images/Group75.png')}
@@ -89,8 +239,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setFirstName(e)}
+            value={firstName}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -101,8 +251,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setLastName(e)}
+            value={lastName}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -111,32 +261,35 @@ const Taxpayer = ({navigation}) => {
         </View>
         <View style={{marginTop: '10%'}}>
           <CustomInputs
-            keyboardType={'numeric'}
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setSocialSecurity(e)}
+            value={socialSecurity}
             secureTextEntry={false}
+            keyboardType="numeric"
           />
           <View style={styles.placeholderTxt}>
             <Text style={styles.formText}>Social Security #</Text>
           </View>
         </View>
 
-        <View style={{marginTop: '10%', width:'100%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
+        <View style={{marginTop: '10%', width: '100%'}}>
+          <Pressable onPress={showDatePicker}>
+            <Text style={{...styles.inpurText, padding: 18}}>
+              {dob}
+              
+            </Text>
+          </Pressable>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Date Picker</Text>
-      </View>
-    </View>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirmDob}
+            onCancel={hideDatePicker}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Date Of Birth</Text>
+          </View>
+        </View>
 
         <View
           style={{
@@ -151,8 +304,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setDLState(e)}
+            value={DLState}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -162,10 +315,9 @@ const Taxpayer = ({navigation}) => {
 
         <View style={{marginTop: '10%'}}>
           <CustomInputs
-            keyboardType={'numeric'}
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setDl(e)}
+            value={DL}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -179,40 +331,41 @@ const Taxpayer = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-               <View style={{marginTop: '10%', width:'49%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
+          <View style={{marginTop: '10%', width: '49%'}}>
+            <Pressable onPress={showDatePicker1}>
+              <Text style={{...styles.inpurText, padding: 18}}>
+                {IssueDate}
+              </Text>
+            </Pressable>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible1}
+              mode="date"
+              onConfirm={handleConfirmIssueDate}
+              onCancel={hideDatePicker}
+            />
+            <View style={styles.placeholderTxt}>
+              <Text style={styles.formText}>Issue Date</Text>
+            </View>
+          </View>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Issue Date</Text>
-      </View>
-    </View>
-
-    <View style={{marginTop: '10%', width:'49%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Exp Date</Text>
-      </View>
-    </View>
+          <View style={{marginTop: '10%', width: '49%'}}>
+            <Pressable onPress={showDatePicker2}>
+              <Text style={{...styles.inpurText, padding: 18}}>
+                
+                {expDate}
+              </Text>
+            </Pressable>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible2}
+              mode="date"
+              onConfirm={handleConfirmExpDate}
+              onCancel={hideDatePicker}
+            />
+            <View style={styles.placeholderTxt}>
+              <Text style={styles.formText}>Exp Date</Text>
+            </View>
+          </View>
         </View>
-
-     
 
         <View
           style={{
@@ -227,8 +380,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setAddress(e)}
+            value={Address}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -239,8 +392,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setCity(e)}
+            value={City}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -251,8 +404,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setState(e)}
+            value={State}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -262,11 +415,11 @@ const Taxpayer = ({navigation}) => {
 
         <View style={{marginTop: '10%'}}>
           <CustomInputs
-            keyboardType={'numeric'}
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setZipCode(e)}
+            value={ZipCode}
             secureTextEntry={false}
+            keyboardType={'numeric'}
           />
           <View style={styles.placeholderTxt}>
             <Text style={styles.formText}>Zip Code</Text>
@@ -276,8 +429,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setCounty(e)}
+            value={County}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -288,8 +441,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={e => setOccupation(e)}
+            value={Occupation}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -298,16 +451,17 @@ const Taxpayer = ({navigation}) => {
         </View>
 
         <View style={{marginTop: '10%'}}>
-        <View style={styles.inpurText}>
-      <MaskInput
-      value={phone}
-      onChangeText={(masked) => {
-        setPhone(masked); 
-        console.log(phone)
-      }}
-      mask={Masks.USA_PHONE}
-    />
-      </View>
+          <View style={styles.inpurText}>
+            <MaskInput
+              value={phone}
+              onChangeText={masked => {
+                setPhone(masked);
+                console.log(phone);
+              }}
+              keyboardType="numeric"
+              // mask={Masks.USA_PHONE}
+            />
+          </View>
 
           <View style={styles.placeholderTxt}>
             <Text style={styles.formText}>Phone Number</Text>
@@ -317,8 +471,8 @@ const Taxpayer = ({navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            value={Username}
-            setValue={setUsername}
+            value={email}
+            setValue={e => setEmail(e)}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -346,7 +500,7 @@ const Taxpayer = ({navigation}) => {
             }}>
             <RadioButton
               color="#0071BC"
-              value="first"
+              value='first'
               status={spouseCheck ? 'checked' : 'unchecked'}
               onPress={() => {
                 spouse();
@@ -355,9 +509,11 @@ const Taxpayer = ({navigation}) => {
             <Text style={{marginRight: '10%', color: '#999999'}}>yes</Text>
             <RadioButton
               color="#0071BC"
-              value="second"
+              value='second'
               status={!spouseCheck ? 'checked' : 'unchecked'}
-              onPress={() => spouse()}
+              onPress={() => {
+                spouse();
+              }}
             />
             <Text style={{color: '#999999'}}>No</Text>
           </View>
@@ -503,7 +659,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 17,
     padding: 17,
-    color:'#000',
+    color: '#000',
     borderColor: '#808080',
     width: '100%',
   },

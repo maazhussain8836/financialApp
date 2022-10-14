@@ -1,7 +1,25 @@
 import {View, Text, Image, StyleSheet, Pressable} from 'react-native';
-import React from 'react';
+import React ,{useContext,useState} from 'react';
 import { moderateScale} from 'react-native-size-matters';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppContext from '../../components/AppContext';
+import Loader from '../../components/Loader';
 const Welcome = ({navigation}) => {
+  const [isloading, setIsloading] = useState(false);
+  const context=useContext(AppContext)
+
+  const onPressLogOut =async () => {
+    setIsloading(true)
+    try {
+      await 
+      AsyncStorage.clear();
+        context.setuserToken(null)
+      // setTimeout(() => {
+        // }, 1000);
+      } catch (e) {}
+      {console.log(context.userToken,'User Token has been removed')}
+          navigation.navigate('SignIn');
+  };
   return (
     <View
       style={{
@@ -11,6 +29,8 @@ const Welcome = ({navigation}) => {
         paddingVertical: '3%',
         backgroundColor:'#FFF',
       }}>
+        {isloading? <Loader />:null }
+        
       <View style={{alignItems: 'center'}}>
         <Image
           source={require('../../assets/images/Group29.png')}
@@ -37,7 +57,7 @@ const Welcome = ({navigation}) => {
         <Pressable onPress={()=>{navigation.navigate('Documents')}}>
         <Text style={styles.txtS}>Scan Tax Documents</Text>
         </Pressable>
-        <Pressable onPress={()=>{navigation.navigate('SignIn')}}>
+        <Pressable onPress={onPressLogOut}>
         <Text
           style={{
             color: '#257ABA',

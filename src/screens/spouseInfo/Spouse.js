@@ -7,48 +7,166 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Pressable
+  Pressable,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import CustomInputs from '../../components/CustomInputs';
-import MaskInput, { Masks } from 'react-native-mask-input';
+import MaskInput, {Masks} from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import moment from 'moment'
-
+import moment from 'moment';
+import axiosConfig from '../../provider/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Spouse = ({route, navigation}) => {
-  const [Username, setUsername] = '';
-  const [text, setText] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dob, setDob] = useState('');
+  const [socialSecurity, setSocialSecurity] = useState('');
+  const [DLState, setDLState] = useState('');
+  const [DL, setDl] = useState('');
+  const [IssueDate, setIssueDate] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [Occupation, setOccupation] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [dob, setDob] = useState('')
-  const {dependantCheck, spouseCheck} = route.params
+  const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
+  const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
+  const {dependantCheck, spouseCheck} = route.params;
 
   useEffect(() => {
-    console.log(navigation, 'navigation')
-  }, [])
-  
-  const goNext = () => {
-    if(dependantCheck){
-      navigation.navigate('Dependent', {dependantCheck: dependantCheck, spouseCheck: spouseCheck} );
-    }else{
-      navigation.navigate('BankInfo');
-    }
-  }
+    console.log(navigation, 'navigation');
+  }, []);
   const showDatePicker = () => {
     setDatePickerVisibility(true);
+  };
+  const showDatePicker1 = () => {
+    setDatePickerVisibility1(true);
+  };
+  const showDatePicker2 = () => {
+    setDatePickerVisibility2(true);
   };
 
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
+  const hideDatePicker1 = () => {
+    setDatePickerVisibility1(false);
+  };
+  const hideDatePicker2 = () => {
+    setDatePickerVisibility2(false);
+  };
 
   const handleConfirm = date => {
-    console.log(date)
-    setDob(moment(date).format('DD/MM/yy'))
+    console.log(date);
+    setDob(moment(date).format('DD/MM/yy'));
     hideDatePicker();
+  };
+  const handleConfirm1 = date => {
+    console.log(date);
+    setIssueDate(moment(date).format('DD/MM/yy'));
+    hideDatePicker1();
+  };
+  const handleConfirm2 = date => {
+    console.log(date);
+    setExpDate(moment(date).format('DD/MM/yy'));
+    hideDatePicker2();
+  };
+
+  const getApi= async()=>{
+    const value = await AsyncStorage.getItem('@auth_token');
+  axiosConfig
+  .get('user_view', {
+    headers: {
+      Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+    },
+  })
+  .then(res => {
+    
+    const spouseData=res.data;
+    spouseData.map((v)=>{
+      console.log(v.spouse_info);
+      setFirstName(v.spouse_info.first_name)
+      setLastName(v.spouse_info.last_name)
+      setDob(v.spouse_info.date_of_birth)
+      setSocialSecurity(v.spouse_info.social_security)
+      setDLState(v.spouse_info.driving_license_state)
+      setDl(v.spouse_info.driving_license_dl)
+      setIssueDate(v.spouse_info.driving_license_issue_date)
+      setExpDate(v.spouse_info.driving_license_exp_date)
+      setOccupation(v.spouse_info.occuption)
+      setPhone(v.spouse_info.cellphone)
+      setEmail(v.spouse_info.email)
+    })
+    // console.log(res.data[0]?.spouse_info, 'get Api response');
+    
+
+  })
+  .catch(err => {
+    console.log(err, 'get Api response error');
+  });
+  }
+  
+  useEffect(() => {
+    getApi()
+  }, [])
+  
+
+  const goNext = async() => {
+    const value = await AsyncStorage.getItem('@auth_token');
+    var data = {
+      first_name: firstName ,
+      last_name: lastName,
+      date_of_birth: dob,
+      social_security: socialSecurity,
+      driving_license_state: DLState,
+      driving_license_dl: DL,
+      driving_license_issue_date: IssueDate,
+      driving_license_exp_date: expDate,
+      occuption: Occupation,
+      cellphone: phone,
+      email: email,
+    };
+    // create spouse data
+    axiosConfig
+      .post('spouse_create', data,  {
+        headers: {
+          Authorization: 'Bearer  ' + value //the token is a variable which holds the token
+        },
+    })
+      .then(res => {
+        console.log(res)
+        alert(res.data.message)
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    // console.log(data)
+      // update spouse data
+    // axiosConfig
+    // .post('spouse_update', data, {
+    //   headers: {
+    //     Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+    //   },
+    // })
+    // .then(res => {
+    //   console.log(res);
+    //   alert(res.data.messsage);
+    // })
+    // .catch(res => {
+    //   console.log(res);
+    // });
+    
+    if (dependantCheck) {
+      navigation.navigate('Dependent', {
+        dependantCheck: dependantCheck,
+        spouseCheck: spouseCheck,
+      });
+    } else {
+      navigation.navigate('BankInfo');
+    }
   };
 
 
@@ -59,7 +177,7 @@ const Spouse = ({route, navigation}) => {
           flex: 1,
           paddingHorizontal: '8%',
           paddingVertical: '10%',
-          backgroundColor:'#FFF',
+          backgroundColor: '#FFF',
         }}>
         <View style={{position: 'absolute'}}>
           <Image
@@ -76,8 +194,8 @@ const Spouse = ({route, navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setFirstName(newText)}
+            value={firstName}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -88,8 +206,8 @@ const Spouse = ({route, navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setLastName(newText)}
+            value={lastName}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -98,31 +216,32 @@ const Spouse = ({route, navigation}) => {
         </View>
         <View style={{marginTop: '10%'}}>
           <CustomInputs
-          keyboardType={'numeric'}
+            keyboardType={'numeric'}
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setSocialSecurity(newText)}
+            value={socialSecurity}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
             <Text style={styles.formText}>Social Security #</Text>
           </View>
         </View>
-        <View style={{marginTop: '10%', width:'100%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Date Of Birth</Text>
-      </View>
-    </View>
+        <View style={{marginTop: '10%', width: '100%'}}>
+          <Pressable onPress={showDatePicker}>
+            <Text style={{...styles.inpurText, padding: 18}}>{dob}</Text>
+          </Pressable>
+
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Date Of Birth</Text>
+          </View>
+        </View>
 
         <View
           style={{
@@ -137,8 +256,8 @@ const Spouse = ({route, navigation}) => {
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setDLState(newText)}
+            value={DLState}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -148,10 +267,10 @@ const Spouse = ({route, navigation}) => {
 
         <View style={{marginTop: '10%'}}>
           <CustomInputs
-          keyboardType={'numeric'}
+            keyboardType={'numeric'}
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setDl(newText)}
+            value={DL}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -159,51 +278,52 @@ const Spouse = ({route, navigation}) => {
           </View>
         </View>
 
-      
-      <View
+        <View
           style={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-               <View style={{marginTop: '10%', width:'49%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
+          <View style={{marginTop: '10%', width: '49%'}}>
+            <Pressable onPress={showDatePicker1}>
+              <Text style={{...styles.inpurText, padding: 18}}>
+                {IssueDate}
+              </Text>
+            </Pressable>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Issue Date</Text>
-      </View>
-    </View>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible1}
+              mode="date"
+              onConfirm={handleConfirm1}
+              onCancel={hideDatePicker1}
+            />
+            <View style={styles.placeholderTxt}>
+              <Text style={styles.formText}>Issue Date</Text>
+            </View>
+          </View>
 
-    <View style={{marginTop: '10%', width:'49%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
+          <View style={{marginTop: '10%', width: '49%'}}>
+            <Pressable onPress={showDatePicker2}>
+              <Text style={{...styles.inpurText, padding: 18}}>{expDate}</Text>
+            </Pressable>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Exp Date</Text>
-      </View>
-    </View>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible2}
+              mode="date"
+              onConfirm={handleConfirm2}
+              onCancel={hideDatePicker2}
+            />
+            <View style={styles.placeholderTxt}>
+              <Text style={styles.formText}>Exp Date</Text>
+            </View>
+          </View>
         </View>
 
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
+            setValue={newText => setOccupation(newText)}
+            value={Occupation}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -212,29 +332,28 @@ const Spouse = ({route, navigation}) => {
         </View>
 
         <View style={{marginTop: '10%'}}>
-        <View style={styles.inpurText}>
-      <MaskInput
-      value={phone}
-      onChangeText={(masked) => {
-        setPhone(masked); 
-        console.log(phone)
-      }}
-      mask={Masks.USA_PHONE}
-    />
-      </View>
+          <View style={styles.inpurText}>
+            <MaskInput
+              value={phone}
+              onChangeText={masked => {
+                setPhone(masked);
+                console.log(phone);
+              }}
+              keyboardType="numeric"
+              
+            />
+          </View>
 
           <View style={styles.placeholderTxt}>
             <Text style={styles.formText}>Phone Number</Text>
           </View>
         </View>
 
-
-
         <View style={{marginTop: '10%'}}>
           <CustomInputs
             placeholder={''}
-            value={Username}
-            setValue={setUsername}
+            value={email}
+            setValue={e => setEmail(e)}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -242,13 +361,23 @@ const Spouse = ({route, navigation}) => {
           </View>
         </View>
 
-        <View style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexDirection:'row',marginTop:'10%'}}>
-          <View style={{width:'30%'}}>
-          <TouchableOpacity onPress={()=>{navigation.navigate('Dependent')}}>
-          <Text style={{...styles.btntext,color:'#0071BC'}}>Skip</Text>
-          </TouchableOpacity>
+        <View
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            marginTop: '10%',
+          }}>
+          <View style={{width: '30%'}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Dependent');
+              }}>
+              <Text style={{...styles.btntext, color: '#0071BC'}}>Skip</Text>
+            </TouchableOpacity>
           </View>
-          <View style={{width:'30%'}}>
+          <View style={{width: '30%'}}>
             <LinearGradient
               colors={['#257ABA', '#145D94', '#003C69']}
               start={{x: 0, y: 0}}
@@ -294,8 +423,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginLeft: 'auto',
     marginRight: 'auto',
-    width:'100%',
-    
+    width: '100%',
   },
   btntext: {
     marginLeft: 'auto',

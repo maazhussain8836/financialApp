@@ -8,88 +8,95 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React, {useState,useEffect} from 'react';
+import React, {useState, useEffect,useContext} from 'react';
 import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
 import CustomInputs from '../../components/CustomInputs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const axios = require('axios').default;
-const baseURL = 'https://designprosusa.com/financial_app/api/login';
+import Loader from '../../components/Loader';
+import AppContext from '../../components/AppContext';
+import axiosconfig from '../../provider/axios'
 
 const SignIn = ({navigation}) => {
   const [Username, setUsername] = useState('');
   const [Password, setPassword] = useState('');
-  // const [message,setMessage]=useState('');
-  // const [token,setToken]=useState(null);
+  const [isloading, setIsloading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  
+  
+  const context = useContext(AppContext);
+  
   const onPressForgot = () => {
     navigation.navigate('ForgotPass');
   };
   const onPressSignIn = () => {
     var data = {
-      email:Username,
-      password:Password,
-      type:'user'
-  }
-
-  // var emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  
-  // if (!emailReg.test(data.email)) {
-  //     alert('Invalid credentials')
-  // }
-
-  if (data.email == '' || data.email == null) {
+      email: Username,
+      password: Password,
+      type: 'user',
+    };
+    
+    // var emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    
+    // if (!emailReg.test(data.email)) {
+    //     alert('Invalid credentials')
+    // }
+    
+    var emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    
+    if (!emailReg.test(data.email)) {
+        // alert('Invalid credentials')
+    }
+    if (data.email == '' || data.email == null) {
       alert('Email Required!');
       return false;
-  }
-  if (data.password == '' || data.password == null) {
+    }
+    if (data.password == '' || data.password == null) {
       alert('Password Required!');
       return false;
-  }
-
-    axios.post(baseURL,
-      data).then(res => {
-      // console.log(res,'response of Api hit');
-      console.log(res.data.message)
-      if (res.data.error) {
-       alert('Invalid Credentials')
     }
-    if (res.data.message) {
-      alert(' we couldn’t find an account with that username')
-   }
-    else {
-      console.log("Got it", res.data.access_token)
-      storeData(res.data.access_token);
-      }
-      
-    }).catch((err)=>{
-      console.log(err)
-    });
+    setIsloading(true);
+    axiosconfig
+      .post('login', data)
+      .then(res => {
+        setIsloading(false);
+        // console.log(res,'response of Api hit');
+        // console.log(res.data.message);
+        if (res.data.error) {
+          alert('Invalid Credentials');
+        }
+        if (res.data.message) {
+          console.log('bbbbbbbbbbbb')
+        } else {
+          // console.log('Got it', res.data.access_token);
+          storeData(res.data.access_token);
+          setIsloading(true);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
     // setUsername(null);
     // setPassword(null);
     // alert('Api hittt');
-    
   };
 
-  
-  const storeData = async (value) => {
+  const storeData = async value => {
     try {
-
       await AsyncStorage.setItem('@auth_token', value);
-      //   context.setuserToken(value);
-      setTimeout(() => {
+        context.setuserToken(value)
+      // setTimeout(() => {
         navigation.navigate('Welcome');
-      }, 1000);
-
-  } catch (e) { }
-};
+        console.log(context.userToken,' after Sign in')
+      // }, 1000);
+    } catch (e) {}
+  };
 
   const onPressSignUp = () => {
     navigation.navigate('SignUp1');
   };
-
 
   return (
     <View
@@ -102,6 +109,11 @@ const SignIn = ({navigation}) => {
         marginRight: 'auto',
         width: '100%',
       }}>
+
+      {
+        isloading ? <Loader/> : null
+      }
+
       <View style={{position: 'absolute'}}>
         <Image
           source={require('../../assets/images/Group75.png')}
@@ -118,7 +130,7 @@ const SignIn = ({navigation}) => {
         <CustomInputs
           placeholder={''}
           value={Username}
-          setValue={(e)=>setUsername(e)}
+          setValue={e => setUsername(e)}
           secureTextEntry={false}
         />
         <View style={styles.placeholderTxt}>
@@ -130,7 +142,7 @@ const SignIn = ({navigation}) => {
         <CustomInputs
           placeholder={''}
           value={Password}
-          setValue={(e)=>setPassword(e)}
+          setValue={e => setPassword(e)}
           secureTextEntry={true}
         />
         <View style={styles.placeholderTxt}>
@@ -152,6 +164,7 @@ const SignIn = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'flex-start',
           }}>
+
           <Switch
             trackColor={{false: '#707070', true: '#93CAF3'}}
             thumbColor={isEnabled ? '#145D94' : '#f4f3f4'}
@@ -159,6 +172,7 @@ const SignIn = ({navigation}) => {
             onValueChange={toggleSwitch}
             value={isEnabled}
           />
+
           <Text style={{color: '#4D4D4D'}}>Remember</Text>
         </View>
         <Pressable onPress={onPressForgot}>

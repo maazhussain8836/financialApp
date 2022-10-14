@@ -5,11 +5,11 @@ import Button from '../../components/Button';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useState,useEffect } from 'react';
-const axios = require('axios').default;
-const baseURL = 'https://designprosusa.com/financial_app/api/register';
+import axiosconfig from '../../provider/axios';
 
 const Verification = ({route, navigation}) => {
   const [otp, setotp] = useState(null);
+  const [token,setToken]=useState(null)
   const {
     email,
     name,
@@ -18,6 +18,7 @@ const Verification = ({route, navigation}) => {
     date,
     password,
     confirm_password,
+    emailForgot,
     type,
     
   } = route.params;
@@ -25,34 +26,49 @@ const Verification = ({route, navigation}) => {
   
 
   const onPressVerify = () => {
-    console.log({
-      email:email,
-      name:name,
-      last_name:last_name,
-      phone_number:phone_number,
-      date:date,
-      password:password,
-      confirm_password:confirm_password,
-      type:type,
-      otp:otp,
-},"console data of post Api which check that routing is proper")
-    // navigation.navigate('Taxpayer');
-    axios.post(baseURL,{
-      email:email,
-      name:name,
-      last_name:last_name,
-      phone_number:phone_number,
-      date:date,
-      password:password,
-      confirm_password:confirm_password,
-      type:type,
-      otp:otp,
-    }).then(res => {
-      console.log(res);
-    });
-  };
+    if(route.params.type =='forgot'){
+  
+      navigation.navigate('ChangePass',{
+        emailForgot:emailForgot,    
+        token:token
+      })
+      console.log('navigate to Change Pass')
+    }
+else{
+  navigateToTaxpayer()
+  console.log('navigate to navigate To Taxpayer')
+}
+//     console.log({
+//       email:email,
+//       name:name,
+//       last_name:last_name,
+//       phone_number:phone_number,
+//       date:date,
+//       password:password,
+//       confirm_password:confirm_password,
+//       type:type,
+//       otp:otp,
+// },"console data of post Api which check that routing is proper")
 
-  // Async Storage to save Token
+};
+
+const navigateToTaxpayer=()=>{
+  navigation.navigate('Taxpayer');
+  axiosconfig.post('register',{
+    email:email,
+    name:name,
+    last_name:last_name,
+    phone_number:phone_number,
+    date:date,
+    password:password,
+    confirm_password:confirm_password,
+    type:type,
+    otp:otp,
+  }).then(res => {
+    console.log(res);
+  });
+}
+  
   return (
     <View style={{flex: 1, position: 'relative', backgroundColor: '#FFF'}}>
       <View style={{height: '26%', position: 'absolute'}}>
@@ -114,8 +130,10 @@ const Verification = ({route, navigation}) => {
             placeholderTextColor="#000"
             onCodeChanged={code => console.log(code)}
             onCodeFilled={code => {
+              setToken(code)
               setotp(code);
-              console.log(otp);
+              console.log(otp,'for signup process');
+              console.log(token,'for forgot process')
             }}
           />
           <Text

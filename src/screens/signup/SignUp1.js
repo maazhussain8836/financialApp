@@ -15,7 +15,7 @@ import CustomInputs from '../../components/CustomInputs';
 import MaskInput, { Masks } from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment'
-
+import axiosconfig from '../../provider/axios'
 const SignUp1 = ({navigation}) => {
   const [email, setemail] = useState('');
   const [Password, setPassword] = useState('');
@@ -26,9 +26,7 @@ const SignUp1 = ({navigation}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [dob, setDob] = useState('')
 
-  const axios = require('axios').default;
-  const baseURL = 'https://designprosusa.com/financial_app/api/register';
- const baseURLOTP='https://designprosusa.com/financial_app/api/otp';
+
   // const [text, setText] = useState('');
 
   const onPressSignIn = () => {
@@ -36,9 +34,10 @@ const SignUp1 = ({navigation}) => {
   };
 
   const onPressSignUp = () => {
-    axios.post(baseURLOTP,{
+    axiosconfig.post('otp',{
       email:email
     }).then((res)=>{console.log(res)})
+    
     navigation.navigate('Verification',{
       email:email,
       name:name,
@@ -66,26 +65,11 @@ const SignUp1 = ({navigation}) => {
   };
 
 
-useEffect(() => {
-  axios.post(baseURL,{
-    name:name,
-    last_name:lastName,
-    phone_number:phone,
-    date:dob,
-    password:Password,
-    confirm_password:confirmPassword,
-    type:'user',
-  }).then(res => {
-    console.log(res);
-  });
-}, [])
-
-
-
-
-
-
-
+// useEffect(() => {
+//   axios.post(baseURL,data).then(res => {
+//     console.log(res);
+//   });
+// }, [])
 
   return (
     <ScrollView>

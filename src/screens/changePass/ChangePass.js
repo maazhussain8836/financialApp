@@ -1,14 +1,28 @@
 import {View, Text, Image, StyleSheet,Pressable} from 'react-native';
 import React from 'react';
-import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
 import Button from '../../components/Button';
-import OTPInputView from '@twotalltotems/react-native-otp-input';
 import CustomInputs from '../../components/CustomInputs';
+import axiosconfig from '../../provider/axios'
+import { useState } from 'react';
+const ChangePass = ({route,navigation}) => {
+    const [newPass, setNewPass] = useState('');
+    const [confirmPass, setConfirmPass] = useState('');
+    
+    const {token,emailForgot}= route.params;
+    // console.log(emailForgot,token,newPass,confirmPass)
 
-const ChangePass = ({navigation}) => {
-    const [Username, setUsername] = '';
-    const [Password, setPassword] = '';
-    const onPress=()=>{
+    const onPressChange=()=>{
+      axiosconfig.post('reset',{
+        // emailForgot:emailForgot, 
+        token:token,
+        password:newPass,
+        password_confirm:confirmPass,
+      })
+      {console.log({
+        emailForgot:emailForgot, 
+       token:token,
+        password:newPass,
+        password_confirm:confirmPass})}
       navigation.navigate('Welcome')
     }
   return (
@@ -19,7 +33,6 @@ const ChangePass = ({navigation}) => {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          
           marginLeft: 'auto',
           marginRight: 'auto',
           paddingHorizontal: '5%',
@@ -49,8 +62,8 @@ const ChangePass = ({navigation}) => {
         <View >  
         <CustomInputs
           placeholder={''}
-          value={Password}
-          setValue={setPassword}
+          value={newPass}
+          setValue={(e)=>setNewPass(e)}
           secureTextEntry={true}
         />
         <View style={styles.placeholderTxt}>
@@ -60,8 +73,8 @@ const ChangePass = ({navigation}) => {
       <View style={{marginTop: '6%'}}>
         <CustomInputs
           placeholder={''}
-          value={Password}
-          setValue={setPassword}
+          value={confirmPass}
+          setValue={(e)=>setConfirmPass(e)}
           secureTextEntry={true}
         />
         <View style={styles.placeholderTxt}>
@@ -70,7 +83,7 @@ const ChangePass = ({navigation}) => {
       </View>
 
         <View >
-          <Pressable onPress={onPress}>
+          <Pressable onPress={onPressChange}>
           <Button text={'Change'} />
           </Pressable>
         </View>
