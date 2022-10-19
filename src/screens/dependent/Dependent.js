@@ -16,6 +16,7 @@ import CustomInputs from '../../components/CustomInputs';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment'
+
 const Dependent = ({route, navigation}) => {
   const [Username, setUsername] = '';
   const [text, setText] = useState('');

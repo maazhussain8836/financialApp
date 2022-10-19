@@ -28,17 +28,20 @@ const Documents = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [cIndex, setCindex] = useState(0);
+  const [imageAlpha,setimageAlpha]=useState(null)
   // const [value, setValue] = useState('Documents');
   // const [done, setDone] = useState('Done');
-  const onPressNext = () => {
-    navigation.navigate('Welcome');
-  };
+  // const onPressNext = () => {
+  //   navigation.navigate('Welcome');
+  // };
 
   const context = useContext(AppContext);
   // useEffect(() => {
   //   console.log(context.images);
   // }, []);
+  
 const openCamer=()=>{
+  
   launchCamera({
     width: 300,
     height: 400,
@@ -50,7 +53,7 @@ const openCamer=()=>{
     // cropperToolbarColor: '#424242',
   })
     .then(image => {
-      let imageAlpha = image.assets[0].uri;
+      setimageAlpha ( image.assets[0].uri)
       console.log(imageAlpha)
       PESDK.openEditor(imageAlpha).then(
           (result) => {
@@ -75,10 +78,6 @@ const openCamer=()=>{
 
 
 
-
-
-
-
   const oipenBox = i => {
     setCindex(i);
     setIsVisible(!visible);
@@ -93,6 +92,7 @@ const openCamer=()=>{
     console.log([...context.images]);
     context.images.splice(i);
     context.setImages([...context.images]);
+    navigation.navigate('Welcome');
   };
 
   const changetxt = (t,i) =>{
@@ -182,23 +182,19 @@ const openCamer=()=>{
                 </Pressable>
               </View>
 
-              <TouchableOpacity onPress={onPressNext}>
+              {/* <TouchableOpacity> */}
                 <View>
                   <LinearGradient
                     colors={['#257ABA', '#145D94', '#003C69']}
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 0}}
                     style={styles.btnV}>
-                    <Pressable
-                      onPress={() => {
-                        navigation.navigate('Welcome');
-                        emptyArray();
-                      }}>
+                    <Pressable onPress={emptyArray}>
                       <Text style={styles.btntext}>Send</Text>
                     </Pressable>
                   </LinearGradient>
                 </View>
-              </TouchableOpacity>
+              {/* </TouchableOpacity> */}
             </View>
           </View>
         </Modal>
@@ -250,7 +246,7 @@ const openCamer=()=>{
         </View>
 
         <View style={{marginTop: '25%', marginBottom: '0%'}}>
-          <Pressable onPress={() => setModalVisible(true)}>
+          <Pressable onPress={() => imageAlpha==null? alert('Kindly Upload documents ') :setModalVisible(true) }>
             <Button text={'Send'} />
           </Pressable>
         </View>
