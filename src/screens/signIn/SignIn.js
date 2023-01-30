@@ -63,16 +63,16 @@ const SignIn = ({navigation}) => {
       .then(res => {
         setIsloading(false);
         // console.log(res,'response of Api hit');
-        // console.log(res.data.message);
+        console.log(res.data.message);
         if (res.data.error) {
           alert('Invalid Credentials');
         }
         if (res.data.message) {
-          console.log('bbbbbbbbbbbb')
+          alert(res.data.message)
         } else {
           // console.log('Got it', res.data.access_token);
           storeData(res.data.access_token);
-          setIsloading(false);
+          setIsloading(true);
         }
       })
       .catch(err => {

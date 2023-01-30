@@ -171,7 +171,6 @@ const Documents = ({navigation}) => {
               marginRight: 'auto',
               width: '86%',
               height: '45%',
-
               position: 'relative',
               shadowColor: '#000',
               backgroundColor: '#FFF',

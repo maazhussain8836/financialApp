@@ -19,7 +19,7 @@ import SignUp1 from './src/screens/signup/SignUp1'
 import Spouse from './src/screens/spouseInfo/Spouse'
 import Verification from './src/screens/verification/Verification'
 import Welcome from './src/screens/welcome/Welcome'
-import GetData from './src/screens/getData/GetData';
+// import GetData from './src/screens/getData/GetData';
 
 
 const App = () => {
@@ -75,7 +75,7 @@ const App = () => {
         <>
         <Stack.Screen name="Intro1" component={Intro1} />
         <Stack.Screen name="Welcome" component={Welcome} />
-        <Stack.Screen name="GetData" component={GetData}/>
+        {/* <Stack.Screen name="GetData" component={GetData}/> */}
 
         </>
       )}

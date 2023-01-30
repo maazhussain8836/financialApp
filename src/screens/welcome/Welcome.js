@@ -107,7 +107,7 @@ const Welcome = ({navigation}) => {
           </Text>
         </TouchableOpacity>
         
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             // borderWidth: 1,
             marginTop: '16%',
@@ -127,7 +127,7 @@ const Welcome = ({navigation}) => {
             }}>
             View Get Data
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
