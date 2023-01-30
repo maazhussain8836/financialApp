@@ -27,7 +27,7 @@ const ForgotPass = ({navigation}) => {
       })
       .then(res => {
         console.log(res);
-        console.log(res.data.message);
+        alert(res.data.message);
        
       });
     navigation.navigate('Verification', {

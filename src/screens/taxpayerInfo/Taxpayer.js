@@ -8,96 +8,98 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import React, {useState, useContext, useEffect} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import LinearGradient from 'react-native-linear-gradient';
-import {scale, verticalScale, moderateScale} from 'react-native-size-matters';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import Button from '../../components/Button';
-import {RadioButton} from 'react-native-paper';
+import { RadioButton } from 'react-native-paper';
 import CustomInputs from '../../components/CustomInputs';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import MaskInput, {Masks} from 'react-native-mask-input';
+import MaskInput, { Masks } from 'react-native-mask-input';
 import axiosconfig from '../../provider/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../components/Loader';
 import AppContext from '../../components/AppContext';
 
-const Taxpayer = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [socialSecurity, setSocialSecurity] = useState('');
-  const [DL, setDl] = useState('');
-  const [Address, setAddress] = useState('');
-  const [City, setCity] = useState('');
-  const [State, setState] = useState('');
-  const [ZipCode, setZipCode] = useState('');
-  const [County, setCounty] = useState('');
-  const [Occupation, setOccupation] = useState('');
-  const [email, setEmail] = useState('');
+const Taxpayer = ({ navigation }) => {
+  const [firstName, setFirstName] = useState(null);
+  const [lastName, setLastName] = useState(null);
+  const [socialSecurity, setSocialSecurity] = useState(null);
+  const [DL, setDl] = useState(null);
+  const [Address, setAddress] = useState(null);
+  const [City, setCity] = useState(null);
+  const [State, setState] = useState(null);
+  const [ZipCode, setZipCode] = useState(null);
+  const [County, setCounty] = useState(null);
+  const [Occupation, setOccupation] = useState(null);
+  const [email, setEmail] = useState(null);
   const [spouseCheck, setspouseCheck] = useState(false);
   const [dependantCheck, setdependantCheck] = useState(false);
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
   const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
-  const [DLState, setDLState] = useState('');
-  const [dob, setDob] = useState('');
-  const [IssueDate, setIssueDate] = useState('');
-  const [expDate, setExpDate] = useState('');
+  const [DLState, setDLState] = useState(null);
+  const [dob, setDob] = useState(null);
+  const [IssueDate, setIssueDate] = useState(null);
+  const [expDate, setExpDate] = useState(null);
   const [isloading, setIsLoading] = useState(false);
 
   // const [taxPayerData,setTaxPayerData]=useState('')
   const context = useContext(AppContext);
 
+  setTimeout(() => {
+    setIsLoading(false)
+  }, 3000);
 
-  
-  const getApi= async()=>{
-    const value = await AsyncStorage.getItem('@auth_token');
-    // setIsLoading(true)
-  axiosconfig
-  .get('user_view', {
-    headers: {
-      Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
-    },
-  })
-  .then(res => {
-    console.log(res.data[0]?.taxpayer_info, 'get Api response');
-    const dataTaxPayer=res.data[0]?.taxpayer_info
-    
-              setFirstName(dataTaxPayer.first_name)
-              setLastName(dataTaxPayer.last_name)
-              setSocialSecurity(dataTaxPayer.social_security)
-              setDl(dataTaxPayer.driving_license_dl)
-              setAddress(dataTaxPayer.address)
-              setCity(dataTaxPayer.city)
-              setState(dataTaxPayer.state)
-              setZipCode(dataTaxPayer.zipcode)
-              setCounty(dataTaxPayer.county)
-              setOccupation(dataTaxPayer.occuption)
-              setEmail(dataTaxPayer.email)
-              setspouseCheck(dataTaxPayer.have_spouse == '0'?  false : true) 
-              setdependantCheck(dataTaxPayer.have_dependant == '0'?  false : true)
-              setPhone(dataTaxPayer.cellphone)
-              setDLState(dataTaxPayer.driving_license_state)
-              setDob(dataTaxPayer.date_of_birth)
-              setIssueDate(dataTaxPayer.driving_license_issue_date)
-              setExpDate(dataTaxPayer.driving_license_exp_date)
-  
-   
-    // setIsLoading(false)
-  })
-  .catch(err => {
-    console.log(err, 'get Api response error');
-  });
-  
-  }
-  
+
+
+    const getApi = async () => {
+      const value = await AsyncStorage.getItem('@auth_token');
+      setIsLoading(true)
+      axiosconfig
+        .get('user_view', {
+          headers: {
+            Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+          },
+        })
+        .then(res => {
+          console.log(res.data[0]?.taxpayer_info, 'get Api response');
+          const dataTaxPayer = res.data[0]?.taxpayer_info
+
+          setFirstName(dataTaxPayer.first_name)
+          setLastName(dataTaxPayer.last_name)
+          setSocialSecurity(dataTaxPayer.social_security)
+          setDl(dataTaxPayer.driving_license_dl)
+          setAddress(dataTaxPayer.address)
+          setCity(dataTaxPayer.city)
+          setState(dataTaxPayer.state)
+          setZipCode(dataTaxPayer.zipcode)
+          setCounty(dataTaxPayer.county)
+          setOccupation(dataTaxPayer.occuption)
+          setEmail(dataTaxPayer.email)
+          setspouseCheck(dataTaxPayer.have_spouse == '0' ? false : true)
+          setdependantCheck(dataTaxPayer.have_dependant == '0' ? false : true)
+          setPhone(dataTaxPayer.cellphone)
+          setDLState(dataTaxPayer.driving_license_state)
+          setDob(dataTaxPayer.date_of_birth)
+          setIssueDate(dataTaxPayer.driving_license_issue_date)
+          setExpDate(dataTaxPayer.driving_license_exp_date)
+
+
+          // setIsLoading(false)
+        })
+        .catch(err => {
+          console.log(err, 'get Api response error');
+        });
+
+    }
   useEffect(() => {
- 
     getApi()
-    
+
   }, [])
-  
+
 
   const spouse = () => {
     setspouseCheck(!spouseCheck);
@@ -129,42 +131,34 @@ const Taxpayer = ({navigation}) => {
     have_spouse: spouseCheck ? '1' : '0',
     have_dependant: dependantCheck ? '1' : '0',
   };
-  
-  const onPressNext = async() => {
-    
+
+  const onPressNext = async () => {
+
     const value = await AsyncStorage.getItem('@auth_token');
 
     // create taxPayer data
     axiosconfig
-    .post('create', data, {
-      headers: {
-        Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
-      },
-    })
-    .then(res => {
-      console.log(res);
-      alert(res.data.messsage);
-    })
-    .catch(res => {
-      console.log(res);
-    });
+      .post('create', data, {
+        headers: {
+          Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
+        },
+      })
+      .then(res => {
+        alert(res.data.messsage);
 
-    // update taxPayer data
-    // axiosconfig
-    // .post('tax_update', data, {
-    //   headers: {
-    //     Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
-    //   },
-    // })
-    // .then(res => {
-    //   console.log(res);
-    //   alert(res.data.messsage);
-    // })
-    // .catch(res => {
-    //   console.log(res);
-    // });
+      })
+      .catch(res => {
+        // alert('Kindly Fill Complete Form');
+        console.log(res);
+      });
+
     
- 
+  if (firstName != null && lastName != null && socialSecurity != null
+    && DL != null && Address != null && City != null && State != null
+    && ZipCode != null && County != null && Occupation != null && email != null
+    && phone != null && DLState != null && dob != null && IssueDate != null
+    && expDate != null)
+  {
     if (spouseCheck) {
       navigation.navigate('Spouse', {
         dependantCheck: dependantCheck,
@@ -178,6 +172,11 @@ const Taxpayer = ({navigation}) => {
     } else {
       navigation.navigate('BankInfo');
     }
+  } 
+  else {
+    alert('kindly fill the form')
+  } 
+
   };
 
   const showDatePicker = () => {
@@ -222,21 +221,22 @@ const Taxpayer = ({navigation}) => {
           paddingVertical: '10%',
           backgroundColor: '#FFF',
         }}>
+
         {isloading ? <Loader /> : null}
         {/* <Loader/> */}
-        <View style={{position: 'absolute'}}>
+        <View style={{ position: 'absolute' }}>
           <Image
             source={require('../../assets/images/Group75.png')}
             style={styles.img}
           />
         </View>
         <View>
-          <Text style={{color: '#257ABA', fontSize: 27, fontWeight: '300'}}>
+          <Text style={{ color: '#257ABA', fontSize: 27, fontWeight: '300' }}>
             Taxpayer Info
           </Text>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setFirstName(e)}
@@ -248,7 +248,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setLastName(e)}
@@ -259,7 +259,7 @@ const Taxpayer = ({navigation}) => {
             <Text style={styles.formText}>Last Name</Text>
           </View>
         </View>
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setSocialSecurity(e)}
@@ -272,11 +272,11 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%', width: '100%'}}>
+        <View style={{ marginTop: '10%', width: '100%' }}>
           <Pressable onPress={showDatePicker}>
-            <Text style={{...styles.inpurText, padding: 18}}>
+            <Text style={{ ...styles.inpurText, padding: 18 }}>
               {dob}
-              
+
             </Text>
           </Pressable>
 
@@ -298,10 +298,10 @@ const Taxpayer = ({navigation}) => {
             justifyContent: 'flex-start',
             marginTop: '4%',
           }}>
-          <Text style={{color: '#0071BC'}}>Driver License Info</Text>
+          <Text style={{ color: '#0071BC' }}>Driver License Info</Text>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setDLState(e)}
@@ -313,7 +313,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setDl(e)}
@@ -331,9 +331,9 @@ const Taxpayer = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-          <View style={{marginTop: '10%', width: '49%'}}>
+          <View style={{ marginTop: '10%', width: '49%' }}>
             <Pressable onPress={showDatePicker1}>
-              <Text style={{...styles.inpurText, padding: 18}}>
+              <Text style={{ ...styles.inpurText, padding: 18 }}>
                 {IssueDate}
               </Text>
             </Pressable>
@@ -348,10 +348,10 @@ const Taxpayer = ({navigation}) => {
             </View>
           </View>
 
-          <View style={{marginTop: '10%', width: '49%'}}>
+          <View style={{ marginTop: '10%', width: '49%' }}>
             <Pressable onPress={showDatePicker2}>
-              <Text style={{...styles.inpurText, padding: 18}}>
-                
+              <Text style={{ ...styles.inpurText, padding: 18 }}>
+
                 {expDate}
               </Text>
             </Pressable>
@@ -374,10 +374,10 @@ const Taxpayer = ({navigation}) => {
             justifyContent: 'flex-start',
             marginTop: '4%',
           }}>
-          <Text style={{color: '#0071BC'}}>Address</Text>
+          <Text style={{ color: '#0071BC' }}>Address</Text>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setAddress(e)}
@@ -389,7 +389,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setCity(e)}
@@ -401,7 +401,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setState(e)}
@@ -413,7 +413,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setZipCode(e)}
@@ -426,7 +426,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setCounty(e)}
@@ -438,7 +438,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             setValue={e => setOccupation(e)}
@@ -450,7 +450,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <View style={styles.inpurText}>
             <MaskInput
               value={phone}
@@ -459,7 +459,7 @@ const Taxpayer = ({navigation}) => {
                 console.log(phone);
               }}
               keyboardType="numeric"
-              // mask={Masks.USA_PHONE}
+            // mask={Masks.USA_PHONE}
             />
           </View>
 
@@ -468,7 +468,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <CustomInputs
             placeholder={''}
             value={email}
@@ -480,7 +480,7 @@ const Taxpayer = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: '10%'}}>
+        <View style={{ marginTop: '10%' }}>
           <View
             style={{
               display: 'flex',
@@ -488,7 +488,7 @@ const Taxpayer = ({navigation}) => {
               justifyContent: 'flex-start',
               marginVertical: '2%',
             }}>
-            <Text style={{color: '#666666'}}>Do you have a Spouse?</Text>
+            <Text style={{ color: '#666666' }}>Do you have a Spouse?</Text>
           </View>
 
           <View
@@ -506,7 +506,7 @@ const Taxpayer = ({navigation}) => {
                 spouse();
               }}
             />
-            <Text style={{marginRight: '10%', color: '#999999'}}>yes</Text>
+            <Text style={{ marginRight: '10%', color: '#999999' }}>yes</Text>
             <RadioButton
               color="#0071BC"
               value='second'
@@ -515,7 +515,7 @@ const Taxpayer = ({navigation}) => {
                 spouse();
               }}
             />
-            <Text style={{color: '#999999'}}>No</Text>
+            <Text style={{ color: '#999999' }}>No</Text>
           </View>
 
           <View
@@ -525,9 +525,9 @@ const Taxpayer = ({navigation}) => {
               justifyContent: 'flex-start',
               marginVertical: '2%',
             }}>
-            <Text style={{color: '#666666'}}>
+            <Text style={{ color: '#666666' }}>
               Do you have dependants that are deductible on your tax return?
-              <Text style={{fontSize: 9, color: '#999999'}}>
+              <Text style={{ fontSize: 9, color: '#999999' }}>
                 (Children, dependant parents, Wards, foster, etc).
               </Text>
             </Text>
@@ -548,14 +548,14 @@ const Taxpayer = ({navigation}) => {
                 dependant();
               }}
             />
-            <Text style={{marginRight: '10%', color: '#999999'}}>yes</Text>
+            <Text style={{ marginRight: '10%', color: '#999999' }}>yes</Text>
             <RadioButton
               color="#0071BC"
               value="second"
               status={!dependantCheck ? 'checked' : 'unchecked'}
               onPress={() => dependant()}
             />
-            <Text style={{color: '#999999'}}>No</Text>
+            <Text style={{ color: '#999999' }}>No</Text>
           </View>
         </View>
 
@@ -567,12 +567,12 @@ const Taxpayer = ({navigation}) => {
             flexDirection: 'row',
             marginTop: '10%',
           }}>
-          <View style={{width: '30%'}}>
+          <View style={{ width: '30%' }}>
             <Pressable onPress={onPressNext}>
               <LinearGradient
                 colors={['#257ABA', '#145D94', '#003C69']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
                 style={styles.btnV}>
                 <Text style={styles.btntext}>Next</Text>
               </LinearGradient>

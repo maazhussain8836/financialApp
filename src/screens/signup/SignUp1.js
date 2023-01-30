@@ -15,6 +15,8 @@ import CustomInputs from '../../components/CustomInputs';
 import MaskInput, { Masks } from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment'
+import Loader from '../../components/Loader';
+
 import axiosconfig from '../../provider/axios'
 const SignUp1 = ({navigation}) => {
   const [email, setemail] = useState('');
@@ -25,7 +27,7 @@ const SignUp1 = ({navigation}) => {
   const [confirmPassword, setconfirmPassword] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [dob, setDob] = useState('')
-
+  const [loadeing,setLoadeing]=useState(false)
 
   // const [text, setText] = useState('');
 
@@ -33,21 +35,37 @@ const SignUp1 = ({navigation}) => {
     navigation.navigate('SignIn');
   };
 
+  const checkFieldInput=()=>{
+    if (email==='' || Password==='' || name==='' || lastName==='' || phone==='' || confirmPassword===''){
+      alert('Fill all the fields')
+    }
+    else{
+      onPressSignUp()
+      navigation.navigate('Verification',{
+        email:email,
+        name:name,
+        last_name:lastName,
+        phone_number:phone,
+        date:dob,
+        password:Password,
+        confirm_password:confirmPassword,
+        type:'user',
+      });
+    }
+  }
   const onPressSignUp = () => {
+    // setLoadeing(true)
     axiosconfig.post('otp',{
       email:email
-    }).then((res)=>{console.log(res)})
+    }).then((res)=>{
+      var dataRes=res.data.hasOwnProperty('email');
+      console.log(dataRes)
+      dataRes==true?alert('This email already been taken'):alert('OTP code has sent to your register email')
+      dataRes==true?console.log('This email already been taken'):console.log('Your OTP code has been sent')
+
+    })
     
-    navigation.navigate('Verification',{
-      email:email,
-      name:name,
-      last_name:lastName,
-      phone_number:phone,
-      date:dob,
-      password:Password,
-      confirm_password:confirmPassword,
-      type:'user',
-    });
+
   };
 
   const showDatePicker = () => {
@@ -81,6 +99,7 @@ const SignUp1 = ({navigation}) => {
           paddingVertical: '10%',
           backgroundColor: '#FFF',
         }}>
+          {loadeing==true? <Loader/>:null}
         <View style={{position: 'absolute'}}>
           <Image
             source={require('../../assets/images/Group75.png')}
@@ -189,7 +208,7 @@ const SignUp1 = ({navigation}) => {
       
 
         <View>
-          <Pressable onPress={onPressSignUp}>
+          <Pressable onPress={()=>checkFieldInput()}>
             <Button text={'Sign Up'} />
           </Pressable>
         </View>

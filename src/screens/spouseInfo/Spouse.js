@@ -19,22 +19,28 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import axiosConfig from '../../provider/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../../components/Loader';
 const Spouse = ({route, navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [dob, setDob] = useState('');
-  const [socialSecurity, setSocialSecurity] = useState('');
-  const [DLState, setDLState] = useState('');
-  const [DL, setDl] = useState('');
-  const [IssueDate, setIssueDate] = useState('');
-  const [expDate, setExpDate] = useState('');
-  const [Occupation, setOccupation] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState(null);
+  const [lastName, setLastName] = useState(null);
+  const [dob, setDob] = useState(null);
+  const [socialSecurity, setSocialSecurity] = useState(null);
+  const [DLState, setDLState] = useState(null);
+  const [DL, setDl] = useState(null);
+  const [IssueDate, setIssueDate] = useState(null);
+  const [expDate, setExpDate] = useState(null);
+  const [Occupation, setOccupation] = useState(null);
+  const [phone, setPhone] = useState(null);
+  const [email, setEmail] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
   const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
   const {dependantCheck, spouseCheck} = route.params;
+  const [isloading,setIsLoading]=useState(false)
+
+  setTimeout(() => {
+    setIsLoading(false)
+  }, 3000);
 
   useEffect(() => {
     console.log(navigation, 'navigation');
@@ -77,6 +83,7 @@ const Spouse = ({route, navigation}) => {
 
   const getApi= async()=>{
     const value = await AsyncStorage.getItem('@auth_token');
+    setIsLoading(true)
   axiosConfig
   .get('user_view', {
     headers: {
@@ -100,6 +107,7 @@ const Spouse = ({route, navigation}) => {
       setPhone(v.spouse_info.cellphone)
       setEmail(v.spouse_info.email)
     })
+    // setIsLoading(false)
     // console.log(res.data[0]?.spouse_info, 'get Api response');
     
 
@@ -141,32 +149,26 @@ const Spouse = ({route, navigation}) => {
         alert(res.data.message)
       })
       .catch(err => {
+        
         console.log(err);
       });
-    // console.log(data)
-      // update spouse data
-    // axiosConfig
-    // .post('spouse_update', data, {
-    //   headers: {
-    //     Authorization: 'Bearer  ' + value, //the token is a variable which holds the token
-    //   },
-    // })
-    // .then(res => {
-    //   console.log(res);
-    //   alert(res.data.messsage);
-    // })
-    // .catch(res => {
-    //   console.log(res);
-    // });
+      if (firstName != null && lastName != null && dob != null
+        && socialSecurity != null && DLState != null && DL != null && IssueDate != null
+        && expDate != null && Occupation != null && phone != null && email != null)
+        {
+          if (dependantCheck) {
+            navigation.navigate('Dependent', {
+              dependantCheck: dependantCheck,
+              spouseCheck: spouseCheck,
+            });
+          } else {
+            navigation.navigate('BankInfo');
+          }
+
+        }else(
+          alert('Kindly Fill Full Form')
+        )
     
-    if (dependantCheck) {
-      navigation.navigate('Dependent', {
-        dependantCheck: dependantCheck,
-        spouseCheck: spouseCheck,
-      });
-    } else {
-      navigation.navigate('BankInfo');
-    }
   };
 
 
@@ -179,6 +181,7 @@ const Spouse = ({route, navigation}) => {
           paddingVertical: '10%',
           backgroundColor: '#FFF',
         }}>
+          {isloading?<Loader/>:null}
         <View style={{position: 'absolute'}}>
           <Image
             source={require('../../assets/images/Group75.png')}

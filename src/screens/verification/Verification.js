@@ -27,7 +27,7 @@ const Verification = ({route, navigation}) => {
 
   const onPressVerify = () => {
     if(route.params.type =='forgot'){
-  
+      token==null?alert('First Enter OTP'):
       navigation.navigate('ChangePass',{
         emailForgot:emailForgot,    
         token:token
@@ -35,25 +35,15 @@ const Verification = ({route, navigation}) => {
       console.log('navigate to Change Pass')
     }
 else{
+  otp==null?alert('First Enter OTP'):
   navigateToTaxpayer()
   console.log('navigate to navigate To Taxpayer')
 }
-//     console.log({
-//       email:email,
-//       name:name,
-//       last_name:last_name,
-//       phone_number:phone_number,
-//       date:date,
-//       password:password,
-//       confirm_password:confirm_password,
-//       type:type,
-//       otp:otp,
-// },"console data of post Api which check that routing is proper")
-
 };
 
 const navigateToTaxpayer=()=>{
-  navigation.navigate('Taxpayer');
+  
+  navigation.navigate('SignIn');
   axiosconfig.post('register',{
     email:email,
     name:name,

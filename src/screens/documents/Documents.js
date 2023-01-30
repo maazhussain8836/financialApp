@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Modal,
   Dimensions,
+  PermissionsAndroid 
 } from 'react-native';
 import React, {useState, useContext, useEffect} from 'react';
 
@@ -19,7 +20,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../../components/Button';
 import AppContext from '../../components/AppContext';
 import ImageView from 'react-native-image-viewing';
-import ImagePicker from 'react-native-image-crop-picker';
 import { launchCamera } from 'react-native-image-picker';
 import {PESDK} from 'react-native-photoeditorsdk';
 
@@ -28,7 +28,7 @@ const Documents = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [cIndex, setCindex] = useState(0);
-  const [imageAlpha,setimageAlpha]=useState(null)
+  // const [imageAlpha,setimageAlpha]=useState(null)
   // const [value, setValue] = useState('Documents');
   // const [done, setDone] = useState('Done');
   // const onPressNext = () => {
@@ -37,11 +37,43 @@ const Documents = ({navigation}) => {
 
   const context = useContext(AppContext);
   // useEffect(() => {
-  //   console.log(context.images);
+  //   console.log(context.images,'documents');
+  //   if(context.images.length==0){
+  //     console.log('document null')
+  //   }
+  //   else{
+  //     console.log('document fill')
+  //   }
   // }, []);
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA
+        // {
+        //   title: "App Camera Permission",
+        //   message:"App needs access to your camera "
+        //   // buttonNeutral: "Ask Me Later",
+        //   buttonNegative: "Cancel",
+        //   buttonPositive: "OK"
+        // }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("Camera permission given");
+        openCamer()
+      } else {
+        console.log("Camera permission denied");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
   
-const openCamer=()=>{
+  // useEffect(() => {
+  //   console.log(imageAlpha,'hello ImageAlpha')
+  // }, [imageAlpha])
   
+  const openCamer=()=>{
+    
   launchCamera({
     width: 300,
     height: 400,
@@ -52,16 +84,19 @@ const openCamer=()=>{
     // cropperStatusBarColor: '#424242',
     // cropperToolbarColor: '#424242',
   })
-    .then(image => {
-      setimageAlpha ( image.assets[0].uri)
-      console.log(imageAlpha)
-      PESDK.openEditor(imageAlpha).then(
+  .then(image => {
+      // let imageAlpha2=image.assets[0].uri;
+      // setimageAlpha(imageAlpha2)
+      // console.log(imageAlpha2,'imageAlpha2')
+      // console.log(imageAlpha,'imageAlpha')
+      PESDK.openEditor(image.assets[0].uri).then(
           (result) => {
             console.log(result,'PESDK');
+            
             context.images.push({
               id: Math.floor(Math.random() * 100),
               uri: result.image,
-              name: 'Document '
+              name: `Document`
             });
             context.setImages([...context.images]);
           },
@@ -69,15 +104,24 @@ const openCamer=()=>{
             console.log(error);
           },
         );
-    
-    })
+      // console.log(image,'image taken')
+      })
     .catch(error => {
-      console.log(error);
+      console.log(error,'camera error ');
     });
 };
 
 
-
+  const sendDoc=()=>{
+    if(context.images.length==0){
+      alert('First Scan Documents')
+      setModalVisible(false)
+    }
+  else{
+    console.log('modal true')
+    setModalVisible(true)
+  }
+}
   const oipenBox = i => {
     setCindex(i);
     setIsVisible(!visible);
@@ -122,11 +166,11 @@ const openCamer=()=>{
             style={{
               // flex: 1,
 
-              marginTop: '30%',
+              marginTop: '55%',
               marginLeft: 'auto',
               marginRight: 'auto',
-              width: '85%',
-              height: '42%',
+              width: '86%',
+              height: '45%',
 
               position: 'relative',
               shadowColor: '#000',
@@ -141,7 +185,7 @@ const openCamer=()=>{
               elevation: 18,
               // borderWidth: 1,
             }}>
-            <View style={{marginTop: '-10%'}}>
+            <View style={{marginTop: '-8%'}}>
               <Image
                 source={require('../../assets/images/Group73.png')}
                 style={styles.spheral}
@@ -151,9 +195,9 @@ const openCamer=()=>{
                 style={styles.email}
               />
             </View>
-            <View style={{marginTop: '60%', alignItems: 'center'}}>
+            <View style={{marginTop: '65%', alignItems: 'center'}}>
               <Text
-                style={{textAlign: 'center', fontSize: 23, color: '#333333'}}>
+                style={{textAlign: 'center', fontSize: 21, color: '#333333'}}>
                 Send profile & documents to Mark Ramsay Financial.
               </Text>
             </View>
@@ -237,7 +281,7 @@ const openCamer=()=>{
             padding: '3%',
             position: 'relative',
           }}>
-          <TouchableOpacity onPress={()=>{openCamer()}}>
+          <TouchableOpacity onPress={()=>{requestCameraPermission()}}>
             <Text style={{color: '#0071BC', fontSize: 19}}>Scan Document</Text>
             <View style={{position: 'absolute', right: 195}}>
               <Icon name="line-scan" size={25} color="#0071BC" />
@@ -246,7 +290,7 @@ const openCamer=()=>{
         </View>
 
         <View style={{marginTop: '25%', marginBottom: '0%'}}>
-          <Pressable onPress={() => imageAlpha==null? alert('Kindly Upload documents ') :setModalVisible(true) }>
+          <Pressable onPress={()=>sendDoc()}>
             <Button text={'Send'} />
           </Pressable>
         </View>
@@ -286,23 +330,23 @@ const styles = StyleSheet.create({
     // marginTop: '22%'
   },
   spheral: {
-    height: moderateScale(140),
-    width: moderateScale(330, 0.1),
+    height: moderateScale(145),
+    width: moderateScale(335, 0.1),
     position: 'absolute',
     // left: moderateScale(12, 0.1),
     top: moderateScale(27, 0.1),
   },
   email: {
-    height: moderateScale(55),
-    width: moderateScale(55, 0.1),
+    height: moderateScale(48),
+    width: moderateScale(48, 0.1),
     position: 'absolute',
-    left: moderateScale(141, 0.1),
-    top: moderateScale(127, 0.1),
+    left: moderateScale(144, 0.1),
+    top: moderateScale(142, 0.1),
   },
   btnV: {
     // marginTop: '6%',
-    padding: 12,
-    paddingHorizontal: '12%',
+    padding: 10,
+    paddingHorizontal: '10%',
     width: '100%',
     marginLeft: 'auto',
     marginRight: 'auto',

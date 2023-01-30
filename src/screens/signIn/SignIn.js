@@ -23,7 +23,7 @@ const SignIn = ({navigation}) => {
   const [isloading, setIsloading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
 
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  // const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   
   
   const context = useContext(AppContext);
@@ -72,7 +72,7 @@ const SignIn = ({navigation}) => {
         } else {
           // console.log('Got it', res.data.access_token);
           storeData(res.data.access_token);
-          setIsloading(true);
+          setIsloading(false);
         }
       })
       .catch(err => {
@@ -158,7 +158,7 @@ const SignIn = ({navigation}) => {
           marginTop: '4%',
           marginBottom: '5%',
         }}>
-        <View
+        {/* <View
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -174,7 +174,7 @@ const SignIn = ({navigation}) => {
           />
 
           <Text style={{color: '#4D4D4D'}}>Remember</Text>
-        </View>
+        </View> */}
         <Pressable onPress={onPressForgot}>
           <Text style={{color: '#0071BC'}}>Forget Password?</Text>
         </Pressable>

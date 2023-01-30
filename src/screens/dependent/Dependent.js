@@ -15,13 +15,21 @@ import Button from '../../components/Button';
 import CustomInputs from '../../components/CustomInputs';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import moment from 'moment'
+import moment from 'moment';
+import {useEffect} from 'react';
+import {resetState} from 'jest-circus';
 
-const Dependent = ({route, navigation}) => {
-  const [Username, setUsername] = '';
-  const [text, setText] = useState('');
+const Dependent = ({navigation}) => {
+  // const [Username, setUsername] = '';
+  const [firstName, setFirstName] = useState(null);
+  const [lastName, setLastName] = useState(null);
+  const [socialSecurity, setSocialSecurity] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [dob, setDob] = useState('')
+  const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
+  const [dob, setDob] = useState(null);
+  const [monthLived, setMonthLived] = useState(null);
+  const [addNew, setAddNew] = useState([null]);
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -31,13 +39,118 @@ const Dependent = ({route, navigation}) => {
   };
 
   const handleConfirm = date => {
-    console.log(date)
-    setDob(moment(date).format('DD/MM/yy'))
+    console.log(date);
+    setDob(moment(date).format('DD/MM/yy'));
     hideDatePicker();
   };
 
+  const showDatePicker1 = () => {
+    setDatePickerVisibility1(true);
+  };
+
+  const hideDatePicker1 = () => {
+    setDatePickerVisibility1(false);
+  };
+
+  const handleConfirm1 = date => {
+    console.log(date);
+    setMonthLived(moment(date).format('DD/MM/yy'));
+    hideDatePicker1();
+  };
+
   const goNext = () => {
-    navigation.navigate('BankInfo');
+    if(firstName!=null && dob!=null && monthLived!=null && lastName!=null && socialSecurity!=null){
+      navigation.navigate('BankInfo');
+    }else{
+      alert('Kindly Fill Complete Form')
+    }
+  };
+
+  const DepDetails = () => {
+    // console.log(index,'this s shfjk',addNew)
+
+    return (
+      <View>
+        <View style={{marginTop: '10%'}}>
+          <CustomInputs
+            placeholder={''}
+            onChangeText={newText => setFirstName(newText)}
+            defaultValue={firstName}
+            secureTextEntry={false}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>First Name</Text>
+          </View>
+        </View>
+
+        <View style={{marginTop: '10%'}}>
+          <CustomInputs
+            placeholder={''}
+            onChangeText={newText => setLastName(newText)}
+            defaultValue={lastName}
+            secureTextEntry={false}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Last Name</Text>
+          </View>
+        </View>
+
+        <View style={{marginTop: '10%'}}>
+          <CustomInputs
+            keyboardType={'numeric'}
+            placeholder={''}
+            onChangeText={newText => setSocialSecurity(newText)}
+            defaultValue={socialSecurity}
+            secureTextEntry={false}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Social Security #</Text>
+          </View>
+        </View>
+
+        <View style={{marginTop: '10%', width: '100%'}}>
+          <Pressable onPress={showDatePicker}>
+            <Text style={{...styles.inpurText, padding: 18}}>{dob}</Text>
+          </Pressable>
+
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>Date Of Birth</Text>
+          </View>
+        </View>
+
+        <View style={{marginTop: '10%', width: '100%'}}>
+          <Pressable onPress={showDatePicker1}>
+            <Text style={{...styles.inpurText, padding: 18}}>{monthLived}</Text>
+          </Pressable>
+
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible1}
+            mode="date"
+            onConfirm={handleConfirm1}
+            onCancel={hideDatePicker1}
+          />
+          <View style={styles.placeholderTxt}>
+            <Text style={styles.formText}>
+              Month Lived with you during years
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+ 
+
+  const addItems = () => {
+    const arr = [...addNew];
+    arr.push(<DepDetails />);
+    setAddNew(arr);
   };
 
   return (
@@ -60,74 +173,27 @@ const Dependent = ({route, navigation}) => {
             Dependant Info
           </Text>
         </View>
+        {/* <View style={{ padding: 10}}> */}
+        {DepDetails()}
+        {/* </View> */}
+        {addNew.map(res => {
+          return <View>{res}</View>;
+        })}
 
-        <View style={{marginTop: '10%'}}>
-          <CustomInputs
-            placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
-            secureTextEntry={false}
-          />
-          <View style={styles.placeholderTxt}>
-            <Text style={styles.formText}>First Name</Text>
+        <TouchableOpacity
+          style={{
+            // borderWidth: 1,
+            width: '20%',
+            // flex:1,
+            // margin:'5%',
+            marginTop:'5%',
+           marginLeft:'auto'
+          }}
+          onPress={() => addItems()}>
+          <View>
+            <Text style={{color: '#0071BC',fontSize:17}}>Add new</Text>
           </View>
-        </View>
-
-        <View style={{marginTop: '10%'}}>
-          <CustomInputs
-            placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
-            secureTextEntry={false}
-          />
-          <View style={styles.placeholderTxt}>
-            <Text style={styles.formText}>Last Name</Text>
-          </View>
-        </View>
-        <View style={{marginTop: '10%'}}>
-          <CustomInputs
-          keyboardType={'numeric'}
-            placeholder={''}
-            onChangeText={newText => setText(newText)}
-            defaultValue={text}
-            secureTextEntry={false}
-          />
-          <View style={styles.placeholderTxt}>
-            <Text style={styles.formText}>Social Security #</Text>
-          </View>
-        </View>
-
-        <View style={{marginTop: '10%', width:'100%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Date Of Birth</Text>
-      </View>
-    </View>
-
-        <View style={{marginTop: '10%', width:'100%'}}>
-      <Pressable onPress={showDatePicker}>
-        <Text style={{...styles.inpurText,padding: 18}}>{dob}</Text>
-      </Pressable>
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <View style={styles.placeholderTxt}>
-        <Text style={styles.formText}>Month Lived with you during years</Text>
-      </View>
-    </View>
+        </TouchableOpacity>
 
         <View
           style={{
@@ -135,7 +201,7 @@ const Dependent = ({route, navigation}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             flexDirection: 'row',
-            paddingTop: '40%',
+            paddingTop: '20%'
           }}>
           <View style={{width: '30%'}}>
             <Pressable

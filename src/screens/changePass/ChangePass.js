@@ -5,8 +5,8 @@ import CustomInputs from '../../components/CustomInputs';
 import axiosconfig from '../../provider/axios'
 import { useState } from 'react';
 const ChangePass = ({route,navigation}) => {
-    const [newPass, setNewPass] = useState('');
-    const [confirmPass, setConfirmPass] = useState('');
+    const [newPass, setNewPass] = useState(null);
+    const [confirmPass, setConfirmPass] = useState(null);
     
     const {token,emailForgot}= route.params;
     // console.log(emailForgot,token,newPass,confirmPass)
@@ -23,7 +23,9 @@ const ChangePass = ({route,navigation}) => {
        token:token,
         password:newPass,
         password_confirm:confirmPass})}
-      navigation.navigate('Welcome')
+        newPass!=null && confirmPass!=null ?
+      navigation.navigate('Welcome'):
+      alert('Kindly Fill Complete Information')
     }
   return (
     <View style={{flex: 1}}>

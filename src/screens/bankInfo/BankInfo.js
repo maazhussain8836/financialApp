@@ -14,17 +14,22 @@ import {moderateScale} from 'react-native-size-matters';
 import CustomInputs from '../../components/CustomInputs';
 import axiosconfig from '../../provider/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../../components/Loader';
 // import RadioBtn from '../../components/RadioBtn';
 
 import {RadioButton} from 'react-native-paper';
 
 const BankInfo = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [routing, setRouting] = useState('');
-  const [accountNo, setAccountNo] = useState('');
-  const [bankAddress, setBankAddress] = useState('');
+  const [name, setName] = useState(null);
+  const [routing, setRouting] = useState(null);
+  const [accountNo, setAccountNo] = useState(null);
+  const [bankAddress, setBankAddress] = useState(null);
   const [checked, setChecked] = useState('Current');
+  const [loading,setLoading]=useState(false)
   
+  setTimeout(() => {
+    setLoading(false)
+  }, 3000);
   const onCheckedYes = () => {
     setChecked('Current');
     // console.log(checked);
@@ -36,6 +41,7 @@ const BankInfo = ({navigation}) => {
 
   const getApi = async () => {
     const value = await AsyncStorage.getItem('@auth_token');
+    setLoading(true)
     axiosconfig
       .get('user_view', {
         headers: {
@@ -51,6 +57,7 @@ const BankInfo = ({navigation}) => {
         setAccountNo(bankData.account_no)
         setBankAddress(bankData.bank_address)
         setChecked(bankData.account_type)
+        
       })
       .catch(err => {
         console.log(err, 'Error while getting Bank data');
@@ -85,8 +92,12 @@ const BankInfo = ({navigation}) => {
       .catch(err => {
         console.log(err);
       });
-
-    navigation.navigate('Documents');
+      if(name!=null && accountNo!=null && bankAddress!=null && checked!=null && routing!=null){
+        navigation.navigate('Documents');
+      }
+      else{
+        alert ('Kindly Fill Complete Form')
+      }
   };
 
   return (
@@ -95,9 +106,10 @@ const BankInfo = ({navigation}) => {
         style={{
           flex: 1,
           paddingHorizontal: '10%',
-          paddingVertical: '12%',
+          paddingVertical: '25%',
           backgroundColor: '#FFF',
         }}>
+          {loading?<Loader/>:null}
         <View style={{position: 'absolute'}}>
           <Image
             source={require('../../assets/images/Group75.png')}
@@ -139,6 +151,7 @@ const BankInfo = ({navigation}) => {
             placeholder={''}
             setValue={newText => setAccountNo(newText)}
             value={accountNo}
+            keyboardType={'numeric'}
             secureTextEntry={false}
           />
           <View style={styles.placeholderTxt}>
@@ -195,7 +208,7 @@ const BankInfo = ({navigation}) => {
             alignItems: 'center',
             justifyContent: 'flex-end',
             flexDirection: 'row',
-            marginTop: '45%',
+            marginTop: '10%',
           }}>
           <TouchableOpacity onPress={onPressNext} style={{width: '30%'}}>
             <LinearGradient
